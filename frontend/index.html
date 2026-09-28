@@ -1,0 +1,1882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ALINIMITY — The Council Chamber</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#02030a; --ink:#f5f7ff; --muted:#8991aa; --dim:#5e657c;
+  --blue:#6f8cff; --cyan:#48e6c1; --pink:#ff4f87; --gold:#ffd36a;
+  --violet:#a679ff; --line:rgba(255,255,255,.10); --glass:rgba(7,10,22,.48);
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#02030a;color:var(--ink)}
+body{font-family:Inter,system-ui,sans-serif;cursor:none}
+button,input,textarea{font:inherit}
+button{cursor:none}
+#spaceBackground{position:fixed;z-index:0;inset:0;width:100%;height:100%;pointer-events:none;object-fit:cover;object-position:center;opacity:.58;filter:saturate(.9) brightness(.72);background:#02030a}#videoVeil{position:fixed;z-index:4;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,rgba(2,3,10,.08),rgba(2,3,10,.48) 88%),linear-gradient(180deg,rgba(2,3,10,.16),rgba(2,3,10,.32))}
+#universe,#dust,#trail{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+#universe{z-index:1;background:#02030a;opacity:.20}
+#dust{z-index:2}
+#trail{z-index:90}
+@media (prefers-reduced-motion: reduce){#spaceBackground{display:none}}
+#cursor{position:fixed;z-index:100;left:50%;top:50%;width:8px;height:8px;border-radius:50%;background:white;box-shadow:0 0 18px 5px rgba(170,210,255,.6);pointer-events:none;transform:translate(-50%,-50%)}
+#cursorRing{position:fixed;z-index:99;left:50%;top:50%;width:34px;height:34px;border:1px solid rgba(180,205,255,.35);border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);transition:width .25s var(--ease),height .25s var(--ease),border-color .25s}
+body.hovering #cursorRing{width:52px;height:52px;border-color:rgba(110,150,255,.75)}
+
+.noise{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E")}
+
+#boot{position:fixed;inset:0;z-index:200;background:#02030a;display:grid;place-items:center;transition:opacity .9s var(--ease),visibility .9s}
+#boot.hide{opacity:0;visibility:hidden;pointer-events:none}
+.boot-core{width:170px;height:170px;position:relative;display:grid;place-items:center}
+.boot-core:before,.boot-core:after{content:"";position:absolute;border-radius:50%;inset:15px;border:1px solid rgba(130,160,255,.25);animation:spin 7s linear infinite}
+.boot-core:after{inset:34px;border-color:rgba(255,110,170,.32);animation-duration:4s;animation-direction:reverse}
+.boot-orb{width:38px;height:38px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff 0 7%,#a8c0ff 18%,#6f8cff 42%,transparent 73%);box-shadow:0 0 60px 18px rgba(100,130,255,.3);animation:breathe 2s ease-in-out infinite}
+.boot-text{position:absolute;bottom:-42px;white-space:nowrap;color:#aab2ca;font:11px "JetBrains Mono";letter-spacing:.2em;text-transform:uppercase}
+@keyframes spin{to{transform:rotate(360deg)}} @keyframes breathe{50%{transform:scale(1.25);filter:hue-rotate(25deg)}}
+
+.topbar{position:fixed;z-index:40;top:16px;left:18px;right:18px;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 16px;border:1px solid rgba(255,255,255,.09);background:rgba(3,5,14,.38);backdrop-filter:blur(22px) saturate(130%);border-radius:18px;box-shadow:0 15px 50px rgba(0,0,0,.25)}
+.logo{display:flex;align-items:center;gap:10px;font:700 15px "Space Grotesk";letter-spacing:.12em}
+.logo-mark{width:28px;height:28px;border-radius:9px;position:relative;background:conic-gradient(from 210deg,var(--blue),var(--cyan),var(--pink),var(--gold),var(--blue));box-shadow:0 0 25px rgba(110,140,255,.35)}
+.logo-mark:after{content:"";position:absolute;inset:5px;border-radius:7px;background:#050712}
+.nav{display:flex;gap:3px;padding:4px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.025);border-radius:999px}
+.nav button{border:0;background:transparent;color:#858da4;padding:9px 16px;border-radius:999px;font-size:12px;transition:.3s var(--ease)}
+.nav button.active{background:rgba(255,255,255,.1);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.status{display:flex;align-items:center;gap:8px;color:#7f879d;font:10px "JetBrains Mono";text-transform:uppercase;letter-spacing:.1em}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan);animation:blink 1.4s infinite}
+@keyframes blink{50%{opacity:.35;transform:scale(.65)}}
+
+.viewport{position:fixed;inset:0;z-index:10;perspective:1400px}
+.panel{position:absolute;inset:0;padding:105px 6vw 55px;display:flex;align-items:flex-start;justify-content:center;opacity:0;visibility:hidden;transform:translate3d(80px,0,-80px) rotateY(-4deg);transition:transform .9s var(--ease),opacity .65s ease,visibility 0s .9s;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+.panel#home{align-items:center}
+.panel::-webkit-scrollbar{display:none}
+#chamber.panel{align-items:flex-start;scrollbar-width:thin;scrollbar-color:rgba(140,160,220,.42) transparent}
+@supports (align-items:safe center){#chamber.panel{align-items:safe center}}
+#chamber.panel::-webkit-scrollbar{display:block;width:6px}
+#chamber.panel::-webkit-scrollbar-track{background:transparent}
+#chamber.panel::-webkit-scrollbar-thumb{background:rgba(140,160,220,.42);border-radius:999px}
+.panel.active{opacity:1;visibility:visible;transform:none;transition-delay:0s}
+.panel.prev{transform:translate3d(-70px,0,-120px) rotateY(5deg)}
+.panel-inner{width:min(1220px,100%);position:relative}
+
+.hero{position:relative;min-height:calc(100svh - 160px);height:calc(100svh - 160px);display:grid;place-items:center;text-align:center}
+.hero-copy{position:relative;z-index:5;width:min(980px,100%);max-width:980px;margin:auto;padding:0 24px}
+.eyebrow{font:10px "JetBrains Mono";letter-spacing:.28em;text-transform:uppercase;color:#8e98b5;margin-bottom:24px}
+.hero h1{font:700 clamp(72px,13vw,190px)/.82 "Space Grotesk";letter-spacing:-.075em;background:linear-gradient(120deg,#fff 10%,#a9bbff 38%,#fff 48%,#ffb4d2 70%,#fff 91%);background-size:220% auto;-webkit-background-clip:text;color:transparent;animation:shine 8s linear infinite}
+@keyframes shine{to{background-position:220% center}}
+.hero h1 span{font-size:.21em;display:block;letter-spacing:.3em;line-height:1.2;margin:28px 0 0 8px;background:linear-gradient(90deg,var(--blue),var(--cyan),var(--pink));-webkit-background-clip:text;color:transparent}
+.hero p{max-width:690px;margin:34px auto 0;color:#9ba3ba;font-size:15px;line-height:1.8}
+.hero-actions{display:flex;justify-content:center;gap:10px;margin-top:34px;flex-wrap:wrap}
+.btn{border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:13px 21px;background:rgba(255,255,255,.045);color:#fff;font-size:12px;transition:.35s var(--ease);position:relative;overflow:hidden}
+.btn:before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent,rgba(255,255,255,.13),transparent);transform:translateX(-120%);transition:.7s}
+.btn:hover:before{transform:translateX(120%)}
+.btn.primary{background:linear-gradient(120deg,var(--blue),#9a75ff 50%,var(--pink));border:0;color:#fff;box-shadow:0 15px 50px rgba(100,100,255,.2)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(100,120,255,.16)}
+.hero-meta{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin-top:25px}
+.pill{font:10px "JetBrains Mono";color:#747e98;border:1px solid rgba(255,255,255,.08);padding:7px 10px;border-radius:999px;background:rgba(5,7,18,.35)}
+
+.hero .panel-inner{position:static}
+
+.float-card{position:absolute;min-width:170px;box-sizing:border-box;border:1px solid rgba(255,255,255,.09);background:rgba(7,10,23,.38);backdrop-filter:blur(16px);border-radius:15px;padding:12px 14px;text-align:left;box-shadow:0 20px 70px rgba(0,0,0,.2);animation:float 5s ease-in-out infinite}
+.float-card small{display:block;color:#6d7690;font:9px "JetBrains Mono";text-transform:uppercase;letter-spacing:.13em;margin-bottom:6px}
+.float-card b{font-size:12px;font-weight:600}
+.fc1{left:7.2vw;top:31%;animation-delay:-1s}.fc2{right:6.4vw;top:31%;animation-delay:-3s}.fc3{left:9.5vw;bottom:15%;animation-delay:-2s}.fc4{right:8.5vw;bottom:15%;animation-delay:-4s}
+@keyframes float{50%{transform:translateY(-12px) rotate(.6deg)}}
+
+/* ALINIMITY LIQUID GLASS */
+.glass,.cmd-box,.toast,.askbar{
+  position:relative;isolation:isolate;
+  background:linear-gradient(135deg,rgba(255,255,255,.105),rgba(255,255,255,.035) 42%,rgba(120,145,255,.055)),rgba(7,10,22,.32);
+  border-color:rgba(255,255,255,.14);
+  backdrop-filter:blur(30px) saturate(155%);-webkit-backdrop-filter:blur(30px) saturate(155%);
+  box-shadow:0 28px 90px rgba(0,0,0,.30),inset 0 1px 0 rgba(255,255,255,.16),inset 0 -1px 0 rgba(255,255,255,.035);
+}
+.glass::before,.topbar::before,.float-card::before,.cmd-box::before,.askbar::before{
+  content:"";position:absolute;inset:1px;border-radius:inherit;pointer-events:none;z-index:-1;
+  background:radial-gradient(circle at 18% 8%,rgba(255,255,255,.13),transparent 28%),linear-gradient(110deg,rgba(255,255,255,.035),transparent 42%,rgba(130,170,255,.035));
+}
+.glass>*,.topbar>*,.float-card>*,.cmd-box>*,.askbar>*{position:relative;z-index:2}
+.nav{background:rgba(255,255,255,.055);backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);box-shadow:inset 0 1px rgba(255,255,255,.10)}
+.nav button.active{background:linear-gradient(135deg,rgba(255,255,255,.19),rgba(255,255,255,.07));color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.13),0 7px 25px rgba(100,130,255,.10)}
+.glass p,.glass h2,.glass b,.glass span,.glass small,.glass textarea,.glass button,.topbar,.nav,.status,.float-card,.btn,.chip{text-shadow:0 1px 18px rgba(0,0,0,.22)}
+.log-item p,.history-item p,.section-title p,.hero p{color:#c1c9dc}
+
+/* AI selector */
+.ai-selector{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;padding:9px 0 8px}
+.ai-chip{min-width:0;display:grid;grid-template-columns:9px 1fr;grid-template-rows:auto auto;column-gap:7px;align-items:center;text-align:left;padding:8px 9px;border:1px solid rgba(255,255,255,.075);border-radius:13px;color:#aeb7ca;background:rgba(255,255,255,.035);transition:.35s var(--ease)}
+.ai-chip i{grid-row:1/3;width:7px;height:7px;border-radius:50%;box-shadow:0 0 13px currentColor}
+.ai-chip span{font:600 10px "Space Grotesk";color:#edf1fb}.ai-chip small{font:8px "JetBrains Mono";color:#6f7890;letter-spacing:.08em}
+.ai-chip:hover{transform:translateY(-2px);background:rgba(255,255,255,.075)}
+.ai-chip.selected{transform:translateY(-3px) scale(1.015);background:rgba(255,255,255,.095);border-color:rgba(255,255,255,.23);box-shadow:0 10px 35px rgba(70,100,255,.15),inset 0 1px rgba(255,255,255,.13)}
+.strategist-chip i{color:var(--blue);background:var(--blue)}.technical-chip i{color:var(--cyan);background:var(--cyan)}.adversarial-chip i{color:var(--pink);background:var(--pink)}.human-mind-chip i{color:var(--violet);background:var(--violet)}.validator-chip i{color:var(--gold);background:var(--gold)}
+
+/* Space-time navigation */
+#warp{position:fixed;inset:0;z-index:125;pointer-events:none;opacity:0;visibility:hidden;overflow:hidden;background:radial-gradient(circle at center,rgba(255,255,255,.05),transparent 12%),radial-gradient(circle at center,rgba(80,110,255,.11),transparent 42%),rgba(1,2,8,.08);transition:opacity .22s ease,visibility 0s .75s}
+#warp.active{opacity:1;visibility:visible;transition-delay:0s}
+.warp-vignette{position:absolute;inset:-20%;background:radial-gradient(ellipse at center,transparent 0 18%,rgba(0,0,0,.75) 72%,#000 100%)}
+.warp-core{position:absolute;left:50%;top:50%;width:14px;height:14px;border-radius:50%;transform:translate(-50%,-50%);background:white;box-shadow:0 0 70px 30px rgba(150,190,255,.7),0 0 180px 70px rgba(120,90,255,.25);animation:warpCore .75s var(--ease) both}
+.warp-lines{position:absolute;inset:-50%;background:repeating-conic-gradient(from 0deg,rgba(150,190,255,0) 0 4deg,rgba(170,205,255,.72) 4.7deg 5deg,rgba(255,255,255,0) 5.8deg 14deg);-webkit-mask-image:radial-gradient(circle at center,transparent 0 7%,#000 16%,#000 54%,transparent 70%);mask-image:radial-gradient(circle at center,transparent 0 7%,#000 16%,#000 54%,transparent 70%);transform:scale(.05);opacity:0}
+#warp.active .warp-lines{animation:warpTravel .82s cubic-bezier(.1,.75,.2,1) forwards}
+@keyframes warpTravel{0%{transform:scale(.05) rotate(0);opacity:0}20%{opacity:.75}100%{transform:scale(1.9) rotate(35deg);opacity:0}}
+@keyframes warpCore{0%{transform:translate(-50%,-50%) scale(.3);opacity:0}30%{opacity:1}100%{transform:translate(-50%,-50%) scale(10);opacity:0}}
+
+/* Rotating 3D-style sun transition */
+#planetFlight{position:fixed;inset:0;z-index:126;pointer-events:none;perspective:900px;opacity:0;visibility:hidden;overflow:hidden}
+#planetFlight.active{opacity:1;visibility:visible}
+.sun3d{position:absolute;left:50%;top:50%;width:290px;height:290px;transform:translate(-50%,-50%) translateX(-55vw) scale(.55) rotateY(-72deg) rotateZ(-10deg);opacity:0;transform-style:preserve-3d;filter:drop-shadow(0 0 34px rgba(255,147,38,.55))}
+.sun-corona{position:absolute;inset:-62px;border-radius:50%;background:conic-gradient(from 0deg,rgba(255,205,75,0),rgba(255,163,45,.8),rgba(255,238,145,.12),rgba(255,119,36,.75),rgba(255,205,75,0));filter:blur(13px);animation:sunCorona 1.2s linear infinite}
+.sun-sphere{position:absolute;inset:30px;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 29% 24%,#fffbd2 0 3%,#ffe875 12%,#ffb52d 34%,#f35e17 64%,#8c1e0d 87%,#250708 100%);box-shadow:inset -42px -28px 48px rgba(54,5,0,.78),inset 18px 14px 28px rgba(255,255,210,.4),0 0 70px 22px rgba(255,153,44,.7);transform-style:preserve-3d;animation:sunModelRotate 1.2s cubic-bezier(.2,.8,.2,1) forwards}
+.sun-sphere:before,.sun-sphere:after{content:"";position:absolute;inset:-25%;border-radius:50%;background:repeating-linear-gradient(12deg,transparent 0 13px,rgba(255,238,127,.38) 17px 23px,transparent 27px 43px);mix-blend-mode:screen;transform:rotate(18deg) scaleX(.72);filter:blur(2px);animation:sunBands 1.2s linear infinite}
+.sun-sphere:after{background:repeating-linear-gradient(-25deg,transparent 0 18px,rgba(180,38,8,.46) 21px 29px,transparent 34px 54px);transform:rotate(-22deg) scaleX(.65);animation:sunBandsReverse .85s linear infinite}
+#planetFlight.active .sun3d{animation:sunTraverse 1.2s cubic-bezier(.16,.9,.2,1) forwards}
+@keyframes sunTraverse{0%{opacity:0;transform:translate(-50%,-50%) translateX(-58vw) translateZ(-240px) scale(.45) rotateY(-78deg) rotateZ(-12deg)}18%{opacity:1}48%{opacity:1;transform:translate(-50%,-50%) translateX(0) translateZ(40px) scale(1.08) rotateY(12deg) rotateZ(5deg)}72%{opacity:.9;transform:translate(-50%,-50%) translateX(17vw) translateZ(20px) scale(.92) rotateY(205deg) rotateZ(12deg)}100%{opacity:0;transform:translate(-50%,-50%) translateX(58vw) translateZ(-80px) scale(.5) rotateY(360deg) rotateZ(20deg)}}
+@keyframes sunModelRotate{0%{transform:rotateY(-70deg) scaleX(.72)}45%{transform:rotateY(0deg) scaleX(1)}100%{transform:rotateY(360deg) scaleX(.78)}}
+@keyframes sunBands{to{transform:rotate(18deg) scaleX(.72) translateX(30px)}}
+@keyframes sunBandsReverse{to{transform:rotate(-22deg) scaleX(.65) translateX(-26px)}}
+@keyframes sunCorona{to{transform:rotate(360deg) scale(1.12)}}
+
+/* AI verdict panel deck — four independent cards, visible together */
+.ai-overlay{position:fixed;inset:0;z-index:130;display:grid;place-items:center;padding:72px 24px 30px;background:radial-gradient(circle at center,rgba(95,70,180,.18),rgba(1,2,8,.88) 76%);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .35s ease,visibility 0s .45s}
+.ai-overlay.open{opacity:1;visibility:visible;pointer-events:auto;transition-delay:0s}
+.ai-panel-shell{width:min(1240px,96vw);min-height:560px;position:relative;overflow:visible;border:1px solid rgba(255,255,255,.13);border-radius:34px;padding:34px 28px 30px;background:linear-gradient(135deg,rgba(255,255,255,.10),rgba(255,255,255,.025) 42%,rgba(60,80,160,.08)),rgba(6,9,20,.52);backdrop-filter:blur(34px) saturate(170%);-webkit-backdrop-filter:blur(34px) saturate(170%);box-shadow:0 50px 160px rgba(0,0,0,.68),inset 0 1px rgba(255,255,255,.16);transform:translateY(38px) scale(.96);opacity:0;transition:transform .65s var(--ease),opacity .45s ease}
+.ai-overlay.open .ai-panel-shell{transform:none;opacity:1}
+.ai-panel-shell:after{content:"";position:absolute;inset:0;border-radius:34px;pointer-events:none;background:linear-gradient(115deg,transparent 20%,rgba(255,255,255,.07) 48%,transparent 56%);transform:translateX(-110%);animation:glassSweep 1.3s .25s var(--ease) forwards}
+@keyframes glassSweep{to{transform:translateX(110%)}}
+.ai-panel-glow{position:absolute;width:430px;height:430px;right:-180px;top:-190px;border-radius:50%;background:radial-gradient(circle,rgba(111,140,255,.30),transparent 68%);filter:blur(12px);pointer-events:none}
+.ai-deck-head{display:flex;justify-content:space-between;align-items:end;gap:25px;position:relative;z-index:2;margin-bottom:24px}
+.ai-deck-head h2{font:600 clamp(32px,4.5vw,58px)/1 "Space Grotesk";letter-spacing:-.055em;margin-top:5px}
+.ai-deck-head p{color:#9ba5bb;font-size:12px;line-height:1.6;max-width:340px;text-align:right}
+.ai-deck{position:relative;z-index:2;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;align-items:stretch}
+.ai-deck-card{--card-color:#6f8cff;min-width:0;min-height:365px;padding:20px 17px 18px;border:1px solid color-mix(in srgb,var(--card-color) 30%,rgba(255,255,255,.10));border-radius:24px;background:linear-gradient(160deg,color-mix(in srgb,var(--card-color) 11%,rgba(8,11,27,.85)),rgba(5,7,17,.62));box-shadow:inset 0 1px rgba(255,255,255,.10),0 18px 55px rgba(0,0,0,.24);cursor:pointer;transition:transform .35s var(--ease),border-color .35s ease,background .35s ease,box-shadow .35s ease;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.ai-deck-card:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 0%,color-mix(in srgb,var(--card-color) 24%,transparent),transparent 42%);pointer-events:none}
+.ai-deck-card:hover{transform:translateY(-8px);border-color:color-mix(in srgb,var(--card-color) 70%,white 10%);box-shadow:0 24px 70px color-mix(in srgb,var(--card-color) 18%,transparent),inset 0 1px rgba(255,255,255,.16)}
+.ai-deck-card.selected{transform:translateY(-14px) scale(1.025);border-color:var(--card-color);box-shadow:0 30px 90px color-mix(in srgb,var(--card-color) 24%,transparent),inset 0 1px rgba(255,255,255,.20)}
+.ai-card-top,.ai-card-title,.ai-card-lines{position:relative;z-index:1}
+.ai-card-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font:8px "JetBrains Mono";letter-spacing:.12em;color:#8490aa}
+.ai-card-number{color:var(--card-color)}
+.ai-card-title{font:600 clamp(20px,2vw,31px)/1.05 "Space Grotesk";letter-spacing:-.045em;margin:25px 0 8px}
+.ai-card-role{font-size:11px;line-height:1.55;color:#9da8bd;min-height:52px}
+.ai-card-orb{width:52px;height:52px;margin:18px 0 20px;border-radius:50%;background:radial-gradient(circle at 35% 28%,#fff 0 7%,var(--card-color) 26%,transparent 68%);box-shadow:0 0 42px var(--card-color);animation:breathe 1.8s ease-in-out infinite}
+.ai-card-lines{display:grid;gap:12px;flex:1}
+.ai-card-line{padding-left:11px;border-left:1px solid color-mix(in srgb,var(--card-color) 55%,rgba(255,255,255,.16))}
+.ai-card-line small{display:block;font:8px "JetBrains Mono";letter-spacing:.10em;color:var(--card-color);margin-bottom:4px}
+.ai-card-line p{font-size:10px;line-height:1.6;color:#c2c9da}
+.ai-card-foot{position:static;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);font:8px "JetBrains Mono";letter-spacing:.08em;color:#6f7b95;flex:none}
+.ai-footer{position:relative;z-index:2;display:flex;justify-content:space-between;margin-top:22px;color:#69748e;font:9px "JetBrains Mono";letter-spacing:.08em}
+.overlay-close{position:absolute;right:20px;top:-52px;z-index:5;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#fff;width:36px;height:36px;border-radius:50%;font-size:22px;line-height:1;transition:.3s var(--ease)}
+.overlay-close:hover{transform:rotate(90deg) scale(1.08);background:rgba(255,255,255,.12)}
+@media(max-width:1200px){.ai-deck{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:1000px){.ai-deck{grid-template-columns:repeat(2,minmax(0,1fr))}.ai-panel-shell{min-height:auto}.ai-deck-card{min-height:330px}.ai-deck-head{align-items:start;flex-direction:column}.ai-deck-head p{text-align:left;max-width:500px}}
+@media(max-width:600px){.ai-overlay{padding:72px 12px 18px;overflow:auto;place-items:start center}.ai-panel-shell{padding:25px 15px 22px;border-radius:25px}.ai-deck{grid-template-columns:1fr}.ai-deck-card{min-height:300px}.ai-deck-card.selected{transform:scale(1.01)}.ai-footer{gap:12px;flex-wrap:wrap}.overlay-close{right:5px;top:-48px}}
+
+
+
+.section-title{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:25px}
+.section-title h2{font:600 clamp(30px,4vw,56px) "Space Grotesk";letter-spacing:-.05em}
+.section-title p{color:#727b94;font-size:12px;max-width:400px;line-height:1.7}
+.kicker{color:var(--cyan);font:10px "JetBrains Mono";letter-spacing:.18em;text-transform:uppercase;margin-bottom:9px}
+
+.chamber-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}
+.glass{border:1px solid rgba(255,255,255,.09);background:linear-gradient(145deg,rgba(14,18,39,.52),rgba(5,7,17,.38));backdrop-filter:blur(24px) saturate(120%);border-radius:24px;box-shadow:0 30px 100px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.035)}
+.orbit-card{min-height:540px;position:relative;overflow:hidden}
+.orbit-card:before{content:"";position:absolute;inset:-30%;background:radial-gradient(circle at 50% 50%,rgba(100,120,255,.09),transparent 40%),radial-gradient(circle at 70% 30%,rgba(255,70,130,.08),transparent 25%);animation:drift 12s linear infinite}
+@keyframes drift{to{transform:rotate(360deg)}}
+.orbit{position:absolute;inset:0}
+.orbit svg{width:100%;height:100%}
+.agent-label{font:600 12px Inter;fill:#eef0fb}
+.agent-sub{font:9px "JetBrains Mono";fill:#727c95}
+.coreText{font:700 11px "JetBrains Mono";fill:#fff;letter-spacing:.15em}
+.debate-log{height:540px;padding:20px;display:flex;flex-direction:column}
+.log-head{display:flex;justify-content:space-between;align-items:center;padding-bottom:15px;border-bottom:1px solid rgba(255,255,255,.07)}
+.log-head b{font:600 12px "Space Grotesk"}
+.log-head span{font:9px "JetBrains Mono";color:#69738d}
+.log-list{overflow:auto;display:flex;flex-direction:column;gap:9px;padding:15px 3px}
+.log-item{display:grid;grid-template-columns:28px 1fr;gap:9px;animation:rise .45s var(--ease)}
+.log-icon{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-size:9px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07)}
+.log-item small{color:#68728c;font:8px "JetBrains Mono";display:block;margin-bottom:3px}
+.log-item p{font-size:11px;line-height:1.5;color:#b7bfd2}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}}
+
+.askbar{grid-column:1/-1;display:flex;gap:10px;padding:10px;border-radius:18px}
+.askbar textarea{flex:1;min-height:48px;max-height:260px;resize:vertical;overflow:auto;background:transparent;border:0;outline:0;color:#e9edfa;padding:10px;font-size:13px;line-height:1.5}
+.askbar textarea::placeholder{color:#5d667e}
+.file-panel{grid-column:1/-1;padding:20px 22px;min-width:0}
+.debate-context-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.debate-context-grid input{min-width:0;border:1px solid rgba(255,255,255,.09);border-radius:10px;background:rgba(255,255,255,.035);color:#dfe6f5;padding:10px 12px;font:11px "JetBrains Mono"}.debate-context-grid input:focus{outline:1px solid rgba(111,140,255,.7)}.argument-summary{margin-top:10px;color:#77829a;font:9px "JetBrains Mono";letter-spacing:.06em;text-transform:uppercase}.argument-summary b{color:#c58cff}@media(max-width:700px){.debate-context-grid{grid-template-columns:1fr}}
+.file-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
+.file-panel-head h3{font:600 18px "Space Grotesk";letter-spacing:-.025em;margin:0 0 5px}
+.file-panel-head p{font-size:11px;line-height:1.55;color:#78829b;max-width:620px}
+.file-private-tag{flex:none;border:1px solid rgba(72,230,193,.18);background:rgba(72,230,193,.055);color:#79dbc2;border-radius:999px;padding:7px 10px;font:8px "JetBrains Mono";letter-spacing:.08em}
+.file-drop{position:relative;display:grid;grid-template-columns:38px 1fr auto;align-items:center;gap:13px;padding:15px 17px;border:1px dashed rgba(111,140,255,.34);border-radius:16px;background:rgba(111,140,255,.045);cursor:pointer;transition:.2s ease}
+.file-drop:hover,.file-drop.drag-over{border-color:rgba(72,230,193,.7);background:rgba(72,230,193,.07)}
+.file-drop:focus-visible{outline:2px solid rgba(72,230,193,.8);outline-offset:3px}
+.file-drop-icon{width:36px;height:36px;display:grid;place-items:center;border:1px solid rgba(111,140,255,.24);border-radius:12px;color:#aebdff;font-size:19px}
+.file-drop b{display:block;font-size:11px;color:#e4e9f8;margin-bottom:4px}
+.file-drop small{font-size:9px;color:#79839c;line-height:1.5}
+.file-drop-cta{padding:9px 12px;border:1px solid rgba(111,140,255,.3);border-radius:10px;color:#cbd4ff;background:rgba(111,140,255,.08);font:8px "JetBrains Mono";letter-spacing:.08em;white-space:nowrap}
+.file-status{min-height:18px;margin:9px 2px 3px;color:#8290ac;font:9px "JetBrains Mono";letter-spacing:.03em}
+.file-status.error{color:#ff91ac}.file-status.success{color:#8be3c8}
+.file-list{display:grid;gap:7px;margin-top:5px}
+.file-empty{padding:14px 4px 3px;color:#68738d;font-size:10px}
+.file-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;padding:10px 12px;border:1px solid rgba(255,255,255,.055);border-radius:12px;background:rgba(255,255,255,.025);min-width:0}
+.file-row-main{display:flex;align-items:center;gap:10px;min-width:0}
+.file-row-icon{flex:none;width:28px;height:28px;display:grid;place-items:center;border-radius:9px;background:rgba(72,230,193,.07);color:#7ce2c8;font-size:12px}
+.file-row-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#d4daea;font-size:10px}
+.file-row-meta{margin-top:3px;color:#6d7892;font:8px "JetBrains Mono"}
+.file-row-actions{display:flex;gap:6px}
+.file-row-actions button{border:1px solid rgba(255,255,255,.09);border-radius:8px;background:rgba(255,255,255,.035);color:#aab4ca;padding:7px 9px;font:8px "JetBrains Mono";cursor:pointer}
+.file-row-actions button:hover{border-color:rgba(111,140,255,.45);color:#fff}.file-row-actions button:disabled{opacity:.45;cursor:wait}
+.file-refresh{border:0;background:transparent;color:#8290ac;font:8px "JetBrains Mono";cursor:pointer;padding:5px}
+.file-panel button:focus-visible{outline:2px solid rgba(72,230,193,.75);outline-offset:2px}
+@media(max-width:600px){.file-panel{padding:16px 13px}.file-panel-head{gap:8px}.file-private-tag{font-size:7px;padding:6px 8px}.file-drop{grid-template-columns:32px 1fr;padding:12px;gap:10px}.file-drop-icon{width:31px;height:31px}.file-drop-cta{grid-column:2;justify-self:start}.file-row{gap:7px;padding:9px}.file-row-actions button{padding:7px}}
+.ask-tools{display:flex;align-items:end;gap:7px}
+.chip{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#8d96ad;padding:8px 11px;border-radius:10px;font-size:10px}
+.chip.active{color:#fff;border-color:rgba(111,140,255,.5);background:rgba(111,140,255,.1)}
+
+.verdict-card{margin-top:15px;padding:17px 19px;border-radius:18px;border:1px solid rgba(255,255,255,.09);background:rgba(5,7,17,.5);opacity:0;transform:translateY(10px);transition:.5s var(--ease)}
+.verdict-card.show{opacity:1;transform:none}
+.v-top{display:flex;justify-content:space-between;gap:15px}
+.v-tag{font:9px "JetBrains Mono";color:var(--gold);text-transform:uppercase;letter-spacing:.15em}
+.v-score{font:700 18px "Space Grotesk"}
+.verdict-card p{font-size:12px;line-height:1.65;color:#aab2c6;margin-top:8px}
+.progress{height:4px;border-radius:5px;background:rgba(255,255,255,.07);overflow:hidden;margin-top:12px}
+.progress i{display:block;width:0;height:100%;background:linear-gradient(90deg,var(--pink),var(--gold),var(--cyan));transition:1.2s var(--ease)}
+
+.history-wrap{display:grid;grid-template-columns:.8fr 1.2fr;gap:18px}
+.stats{padding:25px}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:20px}
+.stat{padding:15px;border:1px solid rgba(255,255,255,.07);border-radius:15px;background:rgba(255,255,255,.025)}
+.stat small{display:block;color:#69728a;font:9px "JetBrains Mono";text-transform:uppercase;margin-bottom:7px}
+.stat b{font:600 27px "Space Grotesk"}
+.timeline{padding:20px;max-height:540px;overflow:auto}
+.timeline-head{display:flex;justify-content:space-between;margin-bottom:15px}
+.timeline-head b{font:600 13px "Space Grotesk"}
+.timeline-head span{font:9px "JetBrains Mono";color:#68718b}
+.history-item{position:relative;padding:15px 15px 15px 19px;border-left:1px solid rgba(111,140,255,.25);margin-left:7px;margin-bottom:8px;background:linear-gradient(90deg,rgba(111,140,255,.035),transparent);border-radius:0 14px 14px 0}
+.history-item:before{content:"";position:absolute;left:-4px;top:18px;width:7px;height:7px;border-radius:50%;background:var(--blue);box-shadow:0 0 12px var(--blue)}
+.history-item small{color:#68728b;font:8px "JetBrains Mono"}
+.history-item b{display:block;font-size:11px;margin:6px 0}
+.history-item p{color:#929bb0;font-size:10px;line-height:1.5}
+
+/* Memory collapse — history is pulled into the black hole behind the glass. */
+#memoryCollapse{position:fixed;inset:0;z-index:170;display:grid;place-items:center;pointer-events:none;opacity:0;visibility:hidden;overflow:hidden;background:radial-gradient(circle at center,rgba(2,3,10,.08) 0 10%,rgba(1,1,6,.42) 43%,rgba(0,0,0,.86) 100%);transition:opacity .35s ease,visibility 0s linear .9s}
+#memoryCollapse.active{opacity:1;visibility:visible;transition-delay:0s}
+.collapse-sheen{position:absolute;inset:-20%;background:conic-gradient(from 20deg at 50% 50%,transparent 0 10%,rgba(111,140,255,.11) 14%,transparent 20% 42%,rgba(255,79,135,.09) 49%,transparent 57% 76%,rgba(72,230,193,.08) 83%,transparent 91%);filter:blur(22px);animation:collapseSheen 1.8s linear infinite}
+.collapse-hole{position:relative;width:min(34vw,260px);aspect-ratio:1;border-radius:50%;transform:scale(.18);opacity:0;background:radial-gradient(circle,#000 0 25%,rgba(0,0,0,.98) 42%,rgba(4,5,16,.78) 47%,transparent 67%);box-shadow:0 0 0 1px rgba(255,255,255,.08),0 0 35px 10px rgba(87,112,255,.36),0 0 120px 35px rgba(103,64,190,.18);transition:transform 1.15s var(--ease),opacity .45s ease}
+#memoryCollapse.active .collapse-hole{transform:scale(1);opacity:1;transition-delay:.08s}
+.collapse-hole:before,.collapse-hole:after{content:"";position:absolute;inset:-18%;border-radius:50%;border:1px solid rgba(140,170,255,.7);transform:rotate(-18deg) scaleY(.36);box-shadow:0 0 20px rgba(111,140,255,.42),inset 0 0 20px rgba(255,79,135,.2);animation:collapseRing 1.25s cubic-bezier(.2,.8,.25,1) infinite}
+.collapse-hole:after{inset:-31%;border-color:rgba(255,105,170,.3);transform:rotate(28deg) scaleY(.24);animation-duration:1.75s;animation-direction:reverse}
+.collapse-hole i{position:absolute;inset:29%;border-radius:50%;background:#000;box-shadow:0 0 28px 7px #000,0 0 50px 18px rgba(0,0,0,.9);z-index:2}
+.collapse-label{position:absolute;top:calc(50% + min(19vw,145px));color:rgba(226,232,255,.72);font:9px "JetBrains Mono";letter-spacing:.28em;text-transform:uppercase;opacity:0;transform:translateY(8px);transition:.5s var(--ease) .25s}
+#memoryCollapse.active .collapse-label{opacity:1;transform:none}
+.collapse-particle{position:absolute;left:50%;top:50%;width:3px;height:3px;border-radius:50%;background:#b9c9ff;box-shadow:0 0 12px 3px currentColor;--orbit:clamp(100px,25vw,340px);animation:collapseParticle var(--duration,1.4s) cubic-bezier(.15,.75,.25,1) var(--delay,0s) both}
+@keyframes collapseParticle{0%{opacity:0;transform:rotate(var(--angle)) translateX(var(--orbit)) scale(.35)}18%{opacity:.9}100%{opacity:0;transform:rotate(calc(var(--angle) + 90deg)) translateX(6px) scale(0)}}
+@keyframes collapseRing{0%{opacity:0;transform:rotate(-18deg) scaleY(.12) scale(1.35)}35%{opacity:1}100%{opacity:.15;transform:rotate(342deg) scaleY(.36) scale(.8)}}
+@keyframes collapseSheen{to{transform:rotate(360deg)}}
+.memory-collapsing .history-item{pointer-events:none;animation:memoryItemSink 1.15s var(--ease) var(--sink-delay) both}
+@keyframes memoryItemSink{0%{opacity:1;filter:none}18%{opacity:1;filter:brightness(1.4)}100%{opacity:0;transform:translate3d(var(--sink-x),var(--sink-y),0) rotate(var(--sink-rotate)) scale(.04);filter:blur(5px) brightness(2)}}
+.memory-collapsing .stats{animation:memoryStatsFade .8s ease both}
+@keyframes memoryStatsFade{to{opacity:.18;filter:blur(2px)}}
+@media (prefers-reduced-motion:reduce){#memoryCollapse .collapse-sheen,.collapse-hole:before,.collapse-hole:after,.collapse-particle{animation:none}.memory-collapsing .history-item,.memory-collapsing .stats{animation:none;opacity:0;transition:opacity .25s ease}}
+
+.command{position:fixed;z-index:150;left:50%;top:50%;width:min(560px,90vw);transform:translate(-50%,-50%) scale(.96);opacity:0;visibility:hidden;transition:.3s var(--ease)}
+.command.open{opacity:1;visibility:visible;transform:translate(-50%,-50%) scale(1)}
+.cmd-box{padding:10px;border-radius:20px;background:rgba(7,9,20,.85);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(28px);box-shadow:0 40px 120px rgba(0,0,0,.6)}
+.cmd-input{width:100%;border:0;outline:0;background:rgba(255,255,255,.04);border-radius:12px;color:#fff;padding:14px;font-size:13px}
+.cmd-actions{display:grid;gap:5px;margin-top:7px}
+.cmd-actions button{text-align:left;border:0;background:transparent;color:#9ba4b9;padding:11px;border-radius:10px;font-size:11px}
+.cmd-actions button:hover{background:rgba(255,255,255,.06);color:#fff}
+.backdrop{position:fixed;inset:0;z-index:140;background:rgba(0,0,0,.45);backdrop-filter:blur(5px);opacity:0;visibility:hidden;transition:.3s}
+.backdrop.open{opacity:1;visibility:visible}
+
+.toast{position:fixed;z-index:160;left:50%;bottom:25px;transform:translate(-50%,20px);opacity:0;padding:10px 14px;border-radius:999px;background:rgba(15,18,35,.85);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(16px);font-size:10px;color:#b9c1d5;transition:.35s var(--ease)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media(max-width:900px){
+  .status{display:none}.topbar{left:10px;right:10px}.nav button{padding:8px 10px}
+  .hero{min-height:calc(100svh - 145px);height:calc(100svh - 145px)}
+  .hero .float-card{display:block;min-width:125px;max-width:150px;padding:9px 10px}.hero .fc1{left:2%;top:15%}.hero .fc2{right:2%;top:23%}.hero .fc3{left:3%;bottom:12%}.hero .fc4{right:3%;bottom:10%}.chamber-grid,.history-wrap{grid-template-columns:1fr}.orbit-card,.debate-log{min-height:410px;height:410px}
+  .askbar{grid-column:auto}.chamber-grid{display:flex;flex-direction:column}.section-title{display:block}.section-title p{margin-top:8px}
+}
+@media(max-width:600px){
+  body{cursor:auto}.nav{display:none}.hero h1{font-size:64px}.panel{padding:95px 15px 30px}.hero{min-height:calc(100svh - 125px);height:calc(100svh - 125px)}.hero-copy{padding:0 8px}
+  .hero p{font-size:13px}.orbit-card{min-height:350px;height:350px}.debate-log{height:350px}
+  .ask-tools .chip{display:none}.askbar{padding:7px}.btn{padding:11px 15px}
+}
+
+/* ---------- games arcade ---------- */
+.games-layout{display:grid;grid-template-columns:270px minmax(0,1fr);gap:14px;align-items:stretch}.games-menu{padding:16px;min-height:520px;background:linear-gradient(145deg,rgba(20,27,64,.56),rgba(7,10,22,.52)),url("/manus-storage/ainimity-games-nebula_0818dd9a.png") center/cover;overflow:hidden}.games-menu h3{font:600 20px "Space Grotesk";letter-spacing:-.04em;margin:7px 0 6px}.games-menu p{font-size:11px;line-height:1.6;color:#a7b0c7;margin-bottom:15px}.game-nav{display:grid;gap:7px}.game-nav button{border:1px solid rgba(255,255,255,.09);background:rgba(1,3,12,.42);color:#b8c2d8;text-align:left;border-radius:12px;padding:10px 11px;transition:.25s var(--ease)}.game-nav button:hover,.game-nav button.active{transform:translateX(4px);background:linear-gradient(110deg,rgba(111,140,255,.24),rgba(72,230,193,.10));border-color:rgba(125,160,255,.42);color:#fff}.game-nav strong{display:block;font:600 11px "Space Grotesk"}.game-nav small{display:block;color:#78849d;font:8px "JetBrains Mono";margin-top:3px;letter-spacing:.06em}.game-console{padding:16px;min-width:0}.game-console-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.game-console-top b{font:600 14px "Space Grotesk"}.game-console-top span{font:9px "JetBrains Mono";color:#7ff4d9;text-transform:uppercase;letter-spacing:.1em}.game-canvas-wrap{position:relative;border:1px solid rgba(255,255,255,.12);border-radius:15px;overflow:hidden;background:#02040e;box-shadow:inset 0 0 80px rgba(60,80,180,.08)}#gameCanvas{display:block;width:100%;height:auto;aspect-ratio:16/10;image-rendering:pixelated}.game-hint{display:flex;justify-content:space-between;gap:10px;margin-top:10px;color:#75809a;font:9px "JetBrains Mono";line-height:1.5}.game-hint b{color:#d8e0f4;font-weight:500}.game-actions{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}.game-actions button{border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:8px 12px;background:rgba(255,255,255,.05);color:#dce5fa;font:9px "JetBrains Mono"}.game-actions button:hover{background:rgba(111,140,255,.16)}
+@media(max-width:900px){.games-layout{grid-template-columns:1fr}.games-menu{min-height:auto}.game-nav{grid-template-columns:repeat(5,minmax(110px,1fr));overflow:auto}.game-nav button:hover,.game-nav button.active{transform:translateY(-2px)}}@media(max-width:600px){.game-nav{grid-template-columns:1fr 1fr}.game-console{padding:11px}.game-hint{display:block}.game-hint span{display:block;margin-top:5px}}
+
+/* ---------- account + voice layer ---------- */
+.auth-gate{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 50% 35%,rgba(89,108,255,.20),rgba(1,2,8,.88) 62%,#010208 100%);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);opacity:1;visibility:visible;transition:opacity .45s ease,visibility 0s}
+.auth-gate.hidden{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .45s ease,visibility 0s .45s}
+.auth-card{width:min(460px,94vw);padding:30px;border:1px solid rgba(255,255,255,.13);border-radius:28px;background:linear-gradient(145deg,rgba(255,255,255,.10),rgba(8,11,27,.72));box-shadow:0 40px 140px rgba(0,0,0,.7),inset 0 1px rgba(255,255,255,.14);backdrop-filter:blur(34px) saturate(150%);-webkit-backdrop-filter:blur(34px) saturate(150%)}
+.auth-brand{display:flex;align-items:center;gap:10px;font:700 14px "Space Grotesk";letter-spacing:.18em;margin-bottom:7px}
+.auth-brand-mark{width:28px;height:28px;border-radius:9px;background:conic-gradient(from 180deg,#6f8cff,#48e6c1,#ff4f87,#ffd36a,#6f8cff);box-shadow:0 0 24px rgba(111,140,255,.4)}
+.auth-kicker{font:9px "JetBrains Mono";color:#6f8cff;letter-spacing:.2em;text-transform:uppercase}
+.auth-card h2{font:600 35px "Space Grotesk";letter-spacing:-.05em;margin:18px 0 8px}
+.auth-card p.auth-sub{font-size:11px;line-height:1.6;color:#8993aa;margin-bottom:20px}
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px;padding:4px;border-radius:12px;background:rgba(255,255,255,.04)}
+.auth-tab{border:0;background:transparent;color:#778199;padding:9px;border-radius:9px;font:9px "JetBrains Mono";letter-spacing:.1em}
+.auth-tab.active{background:rgba(111,140,255,.13);color:#fff;border:1px solid rgba(111,140,255,.25)}
+.auth-form{display:grid;gap:11px}
+.auth-form.hidden{display:none}
+.auth-form label{font:8px "JetBrains Mono";letter-spacing:.13em;color:#727d95;text-transform:uppercase}
+.auth-form input{width:100%;box-sizing:border-box;border:1px solid rgba(255,255,255,.09);outline:0;border-radius:12px;padding:12px 13px;background:rgba(0,0,0,.22);color:#eef1fb}
+.auth-form input:focus{border-color:rgba(111,140,255,.58);box-shadow:0 0 0 3px rgba(111,140,255,.08)}
+.auth-submit{margin-top:4px;width:100%;border:1px solid rgba(111,140,255,.55);border-radius:12px;padding:12px;background:linear-gradient(135deg,rgba(111,140,255,.24),rgba(72,230,193,.12));color:#fff;font:600 11px "Space Grotesk";letter-spacing:.05em}
+.auth-submit:disabled{opacity:.55}
+.auth-message{min-height:17px;margin-top:12px;font:9px "JetBrains Mono";color:#9aa5bc;line-height:1.5}
+.auth-message.error{color:#ff8eae}.auth-message.success{color:#7ff4d9}
+.auth-note{margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.07);font:8px "JetBrains Mono";color:#59647d;line-height:1.6}
+.account-area{display:flex;align-items:center;gap:8px}
+.account-pill{max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:7px 10px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.04);font:9px "JetBrains Mono";color:#9ba6bd}
+.logout-btn{border:1px solid rgba(255,79,135,.22);background:rgba(255,79,135,.06);color:#d88aa2;padding:7px 9px;border-radius:10px;font:8px "JetBrains Mono";letter-spacing:.08em}
+.voice-wrap{display:flex;align-items:center;gap:6px}
+.voice-btn{min-width:74px}
+.voice-btn.listening{border-color:rgba(255,79,135,.65);background:rgba(255,79,135,.13);color:#fff;box-shadow:0 0 24px rgba(255,79,135,.15);animation:voicePulse 1s ease-in-out infinite}
+.voice-state{font:7px "JetBrains Mono";color:#69748d;letter-spacing:.08em;min-width:44px}
+@keyframes voicePulse{50%{transform:translateY(-1px);box-shadow:0 0 30px rgba(255,79,135,.28)}}
+@media(max-width:720px){.account-pill{display:none}.voice-state{display:none}.auth-card{padding:24px}}
+
+/* ---------- multi-mode workspace ---------- */
+.workspace-layout{display:grid;grid-template-columns:270px minmax(0,1fr);gap:14px;align-items:start}.workspace-menu{padding:16px;position:sticky;top:0}.workspace-menu h3{font:600 20px "Space Grotesk";margin:7px 0 6px}.workspace-menu p{font-size:11px;line-height:1.6;color:#a7b0c7;margin-bottom:15px}.workspace-mode-list{display:grid;gap:7px}.workspace-mode{border:1px solid rgba(255,255,255,.09);background:rgba(1,3,12,.42);color:#b8c2d8;text-align:left;border-radius:12px;padding:10px 11px;transition:.25s var(--ease);cursor:pointer}.workspace-mode:hover,.workspace-mode.active{transform:translateX(4px);background:linear-gradient(110deg,rgba(111,140,255,.24),rgba(72,230,193,.10));border-color:rgba(125,160,255,.42);color:#fff}.workspace-mode strong{display:block;font:600 11px "Space Grotesk"}.workspace-mode small{display:block;color:#78849d;font:8px "JetBrains Mono";margin-top:3px;letter-spacing:.06em}.workspace-console{padding:20px;min-width:0}.workspace-console-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px}.workspace-console-head h3{font:600 24px "Space Grotesk"}.workspace-console-head p{color:#8995ae;font-size:11px;line-height:1.6;max-width:560px;margin-top:5px}.workspace-badge{border:1px solid rgba(72,230,193,.25);color:#7ce2c8;background:rgba(72,230,193,.06);border-radius:999px;padding:7px 10px;font:8px "JetBrains Mono";white-space:nowrap}.workspace-inputs{display:grid;gap:9px}.workspace-inputs textarea,.workspace-inputs input{width:100%;border:1px solid rgba(255,255,255,.09);border-radius:12px;background:rgba(0,0,0,.22);color:#eef1fb;padding:12px 13px;outline:0;font-size:12px}.workspace-inputs textarea{min-height:105px;resize:vertical;line-height:1.55}.workspace-inputs textarea:focus,.workspace-inputs input:focus{border-color:rgba(111,140,255,.65);box-shadow:0 0 0 3px rgba(111,140,255,.08)}.workspace-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}.workspace-status{color:#8290ac;font:9px "JetBrains Mono";letter-spacing:.05em}.workspace-output{margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08)}.workspace-output.empty{color:#657089;text-align:center;padding:28px 10px}.workspace-summary{color:#dbe3f7;font-size:13px;line-height:1.7;margin-bottom:14px}.workspace-section{padding:13px 14px;border:1px solid rgba(255,255,255,.07);border-radius:14px;background:rgba(255,255,255,.025);margin-top:9px}.workspace-section h4{font:600 12px "Space Grotesk";color:#dce5ff;margin-bottom:6px}.workspace-section p{color:#aab4ca;font-size:11px;line-height:1.65}.workspace-section ul{margin:8px 0 0 17px;color:#9da9c2;font-size:10px;line-height:1.65}.workspace-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.workspace-meta span{border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:6px 9px;color:#9da9c2;font:8px "JetBrains Mono"}.workspace-meta .confidence{color:#ffd36a;border-color:rgba(255,211,106,.28)}.workspace-caveat{color:#d5b37b;font-size:10px;line-height:1.55;margin-top:10px}.workspace-actions-list{color:#7ce2c8;font-size:10px;line-height:1.7;margin:10px 0 0 17px}.workspace-citations{color:#8290ac;font:8px "JetBrains Mono";margin-top:12px}@media(max-width:820px){.workspace-layout{grid-template-columns:1fr}.workspace-menu{position:static}.workspace-mode-list{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.workspace-mode-list{grid-template-columns:1fr}.workspace-console-head{display:block}.workspace-badge{display:inline-block;margin-top:10px}}
+
+/* ---------- quantum multiverse skin ---------- */
+body{--universe-a:#6f8cff;--universe-b:#48e6c1;--universe-c:#ff4f87}
+body[data-universe="home"]{--universe-a:#6f8cff;--universe-b:#48e6c1;--universe-c:#ff4f87}
+body[data-universe="chamber"]{--universe-a:#ff4f87;--universe-b:#a679ff;--universe-c:#ffd36a}
+body[data-universe="workspace"]{--universe-a:#43d8ff;--universe-b:#b47cff;--universe-c:#ff65b3}
+body[data-universe="history"]{--universe-a:#ffd36a;--universe-b:#8ba4ff;--universe-c:#69e0c0}
+body[data-universe="games"]{--universe-a:#ff7e4d;--universe-b:#ffcf5a;--universe-c:#c17bff}
+body[data-universe] #universe{background:radial-gradient(circle at 22% 18%,color-mix(in srgb,var(--universe-a) 20%,transparent),transparent 33%),radial-gradient(circle at 80% 72%,color-mix(in srgb,var(--universe-b) 17%,transparent),transparent 36%),#02030a;opacity:.34;transition:background 1s ease,opacity 1s ease}
+body[data-universe] #videoVeil{background:radial-gradient(ellipse at center,rgba(2,3,10,.02),rgba(2,3,10,.56) 92%),linear-gradient(180deg,rgba(2,3,10,.10),rgba(2,3,10,.35))}
+body[data-universe] .topbar{border-color:color-mix(in srgb,var(--universe-a) 34%,rgba(255,255,255,.09));box-shadow:0 15px 50px color-mix(in srgb,var(--universe-a) 12%,transparent)}
+body[data-universe] .logo-mark{background:conic-gradient(from 210deg,var(--universe-a),var(--universe-b),var(--universe-c),var(--universe-a));box-shadow:0 0 28px color-mix(in srgb,var(--universe-a) 45%,transparent)}
+body[data-universe] .nav button.active{background:linear-gradient(135deg,color-mix(in srgb,var(--universe-a) 30%,transparent),color-mix(in srgb,var(--universe-b) 18%,transparent));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--universe-a) 45%,transparent),0 8px 30px color-mix(in srgb,var(--universe-a) 18%,transparent)}
+#quantumJump{position:fixed;inset:0;z-index:127;pointer-events:none;opacity:0;visibility:hidden;overflow:hidden;background:radial-gradient(circle at center,rgba(255,255,255,.16),transparent 9%),radial-gradient(circle at center,color-mix(in srgb,var(--universe-a) 20%,transparent),transparent 43%),rgba(1,2,8,.52);transition:opacity .18s ease,visibility 0s .95s}
+#quantumJump.active{opacity:1;visibility:visible;transition-delay:0s}
+.quantum-branch{position:absolute;left:50%;top:50%;width:60vw;height:1px;transform-origin:left center;background:linear-gradient(90deg,rgba(255,255,255,.92),color-mix(in srgb,var(--universe-a) 70%,transparent),transparent);box-shadow:0 0 18px color-mix(in srgb,var(--universe-a) 75%,transparent);opacity:0}
+.quantum-branch:nth-child(1){--r:-32deg;transform:rotate(-32deg) scaleX(.2)}.quantum-branch:nth-child(2){--r:-13deg;transform:rotate(-13deg) scaleX(.2)}.quantum-branch:nth-child(3){--r:11deg;transform:rotate(11deg) scaleX(.2)}.quantum-branch:nth-child(4){--r:31deg;transform:rotate(31deg) scaleX(.2)}
+#quantumJump.active .quantum-branch{animation:branchSplit .9s var(--ease) forwards}.quantum-branch:nth-child(2){animation-delay:.05s!important}.quantum-branch:nth-child(3){animation-delay:.1s!important}.quantum-branch:nth-child(4){animation-delay:.15s!important}
+@keyframes branchSplit{0%{opacity:0;transform-origin:left center;transform:rotate(var(--r,0deg)) scaleX(.05)}20%{opacity:1}100%{opacity:0;transform:rotate(var(--r,0deg)) scaleX(1.7)}}
+.quantum-node{position:absolute;left:50%;top:50%;width:9px;height:9px;border-radius:50%;background:#fff;box-shadow:0 0 28px 8px var(--universe-a),0 0 70px 18px var(--universe-b);transform:translate(-50%,-50%);opacity:0}
+#quantumJump.active .quantum-node{animation:nodeBurst .9s var(--ease) forwards}
+@keyframes nodeBurst{0%{opacity:0;transform:translate(-50%,-50%) scale(.2)}22%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(14)}}
+.quantum-caption{position:absolute;left:50%;top:50%;transform:translate(-50%,74px);font:10px "JetBrains Mono";letter-spacing:.23em;color:#dce6ff;white-space:nowrap;text-transform:uppercase;text-shadow:0 0 24px var(--universe-a);opacity:0}
+#quantumJump.active .quantum-caption{animation:captionFlash .9s .08s ease both}
+@keyframes captionFlash{0%,100%{opacity:0;letter-spacing:.36em}35%,72%{opacity:1;letter-spacing:.23em}}
+.universe-banner{position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) 170px;gap:16px;align-items:center;margin-bottom:16px;padding:18px 20px;border:1px solid color-mix(in srgb,var(--universe-a) 27%,rgba(255,255,255,.1));border-radius:22px;background:linear-gradient(110deg,color-mix(in srgb,var(--universe-a) 13%,rgba(8,10,24,.52)),rgba(8,10,24,.30) 60%,color-mix(in srgb,var(--universe-b) 12%,rgba(8,10,24,.42)));box-shadow:0 20px 65px color-mix(in srgb,var(--universe-a) 10%,transparent),inset 0 1px rgba(255,255,255,.12)}
+.universe-banner:after{content:"";position:absolute;width:320px;height:320px;right:-84px;top:-120px;border-radius:50%;background:conic-gradient(from 80deg,transparent,color-mix(in srgb,var(--universe-a) 55%,transparent),transparent 28%,color-mix(in srgb,var(--universe-b) 48%,transparent),transparent 60%);filter:blur(5px);animation:nebulaSpin 12s linear infinite;pointer-events:none}.universe-banner h3{font:600 24px "Space Grotesk";letter-spacing:-.04em}.universe-banner p{max-width:650px;margin-top:6px;color:#aab6d0;font-size:11px;line-height:1.65}.universe-banner .kicker{color:var(--universe-b)}.cosmic-object{position:relative;z-index:1;width:132px;height:90px;justify-self:end;border-radius:50%;background:radial-gradient(ellipse at center,transparent 0 26%,color-mix(in srgb,var(--universe-a) 72%,transparent) 28% 32%,transparent 34% 43%,color-mix(in srgb,var(--universe-c) 62%,transparent) 46% 49%,transparent 52%),radial-gradient(circle at center,#fff 0 5%,color-mix(in srgb,var(--universe-b) 80%,transparent) 7% 17%,transparent 28%);filter:drop-shadow(0 0 16px color-mix(in srgb,var(--universe-a) 70%,transparent));transform:rotate(-12deg);animation:objectFloat 4s ease-in-out infinite}.cosmic-object:before,.cosmic-object:after{content:"";position:absolute;inset:14px 28px;border:1px solid color-mix(in srgb,var(--universe-a) 72%,transparent);border-radius:50%;transform:rotate(34deg);opacity:.55}.cosmic-object:after{inset:7px 36px;transform:rotate(-27deg);border-color:color-mix(in srgb,var(--universe-b) 65%,transparent)}
+@keyframes nebulaSpin{to{transform:rotate(360deg)}}@keyframes objectFloat{50%{transform:rotate(-8deg) translateY(-7px) scale(1.03)}}
+#workspace.panel{align-items:flex-start}#workspace.panel .panel-inner{padding-top:8px}
+#workspace.panel:before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 12% 70%,color-mix(in srgb,var(--universe-a) 8%,transparent),transparent 25%),radial-gradient(circle at 88% 25%,color-mix(in srgb,var(--universe-b) 9%,transparent),transparent 28%);opacity:.8}
+#chamber.panel:before{content:"";position:absolute;width:72vw;height:38vw;max-width:920px;max-height:490px;left:50%;top:54%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse at center,rgba(0,0,0,.9) 0 20%,transparent 21% 29%,color-mix(in srgb,var(--universe-a) 40%,transparent) 30% 33%,transparent 34% 41%,color-mix(in srgb,var(--universe-b) 24%,transparent) 42% 46%,transparent 47%);filter:blur(1px);opacity:.19;pointer-events:none;animation:singularityDrift 18s ease-in-out infinite}
+#history.panel:before{content:"";position:absolute;width:45vw;height:45vw;right:-15vw;top:8%;border-radius:50%;background:radial-gradient(circle at 36% 34%,rgba(255,255,255,.55) 0 1%,transparent 2%),radial-gradient(circle at 49% 46%,color-mix(in srgb,var(--universe-a) 42%,transparent) 0 19%,transparent 20% 36%,color-mix(in srgb,var(--universe-b) 30%,transparent) 37% 39%,transparent 40%);box-shadow:0 0 100px color-mix(in srgb,var(--universe-a) 14%,transparent);opacity:.28;pointer-events:none;animation:archiveOrbit 24s linear infinite}
+#games.panel:before{content:"";position:absolute;width:38vw;height:38vw;left:-12vw;bottom:-8vw;border-radius:50%;background:radial-gradient(circle at center,#fff 0 2%,color-mix(in srgb,var(--universe-a) 78%,transparent) 4% 9%,transparent 11% 18%,color-mix(in srgb,var(--universe-b) 56%,transparent) 19% 21%,transparent 22% 38%,color-mix(in srgb,var(--universe-c) 35%,transparent) 39% 40%,transparent 41%);filter:blur(.4px);opacity:.24;pointer-events:none;animation:pulsarBeat 2.2s ease-in-out infinite}
+@keyframes singularityDrift{50%{transform:translate(-50%,-50%) rotate(12deg) scale(1.06);filter:hue-rotate(25deg)}}@keyframes archiveOrbit{to{transform:rotate(360deg)}}@keyframes pulsarBeat{50%{transform:scale(1.08);opacity:.4}}
+@media(max-width:700px){.universe-banner{grid-template-columns:1fr}.cosmic-object{justify-self:start;width:110px;height:70px}.quantum-caption{font-size:8px;letter-spacing:.12em}}
+@media (prefers-reduced-motion: reduce){#quantumJump,.quantum-branch,.quantum-node,.quantum-caption{animation:none!important;transition:none!important}.universe-banner:after,.cosmic-object{animation:none!important}}
+
+/* ---------- Evidence Observatory + ChronoForge ---------- */
+body[data-universe="observatory"]{--universe-a:#54e2c0;--universe-b:#ffd36a;--universe-c:#74a7ff}
+body[data-universe="chronoforge"]{--universe-a:#ff875f;--universe-b:#ffd36a;--universe-c:#b47cff}
+body[data-universe="observatory"] #universe,body[data-universe="chronoforge"] #universe{background:radial-gradient(circle at 18% 24%,color-mix(in srgb,var(--universe-a) 18%,transparent),transparent 31%),radial-gradient(circle at 82% 70%,color-mix(in srgb,var(--universe-b) 15%,transparent),transparent 34%),#02030a;opacity:.34}
+.observatory-grid,.chrono-grid{display:grid;grid-template-columns:minmax(260px,.72fr) minmax(0,1.28fr);gap:16px}
+.observatory-card,.chrono-card{border:1px solid color-mix(in srgb,var(--universe-a) 28%,rgba(255,255,255,.12));border-radius:22px;padding:18px;background:linear-gradient(135deg,color-mix(in srgb,var(--universe-a) 11%,rgba(7,10,22,.56)),rgba(7,10,22,.35));box-shadow:inset 0 1px rgba(255,255,255,.11),0 20px 70px rgba(0,0,0,.24)}
+.observatory-card h3,.chrono-card h3{font:600 22px "Space Grotesk";letter-spacing:-.04em}.observatory-card p,.chrono-card p{color:#aab5cc;font-size:11px;line-height:1.65;margin-top:6px}
+.manual-label{display:block;margin:14px 0 6px;color:#8490aa;font:9px "JetBrains Mono";letter-spacing:.13em;text-transform:uppercase}.manual-select,.manual-input,.manual-textarea{width:100%;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:11px 12px;background:rgba(0,0,0,.22);color:#eef3ff;outline:none}.manual-textarea{min-height:150px;resize:vertical}.manual-select:focus,.manual-input:focus,.manual-textarea:focus{border-color:color-mix(in srgb,var(--universe-a) 70%,white 10%);box-shadow:0 0 0 3px color-mix(in srgb,var(--universe-a) 13%,transparent)}
+.manual-file{display:block;padding:14px;border:1px dashed color-mix(in srgb,var(--universe-a) 42%,rgba(255,255,255,.2));border-radius:14px;background:rgba(255,255,255,.025);color:#c5d0e8;font-size:11px}.manual-file input{width:100%;margin-top:9px;color:#aebbd2}
+.safety-note{margin-top:13px;padding:11px 12px;border-left:2px solid #ffd36a;background:rgba(255,211,106,.07);color:#e5d9ae;font-size:10px;line-height:1.6}.observatory-output,.chrono-output{min-height:240px}.score-ring{display:flex;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.09)}.score-ring strong{font:700 42px "Space Grotesk";color:var(--universe-a)}.score-ring small{display:block;color:#77839e;font:9px "JetBrains Mono";letter-spacing:.12em}.signal-list,.claim-list,.checkpoint-list,.branch-list{display:grid;gap:9px;margin-top:14px}.signal-item,.claim-item,.checkpoint-item,.branch-item{padding:11px 12px;border:1px solid rgba(255,255,255,.08);border-radius:13px;background:rgba(255,255,255,.035)}.signal-item b,.claim-item b,.checkpoint-item b,.branch-item b{display:block;color:#f1f5ff;font-size:11px;margin-bottom:4px}.signal-item span,.claim-item span,.checkpoint-item span,.branch-item span{color:#aab6ce;font-size:10px;line-height:1.55}.claim-item[data-status="contradicted"]{border-color:rgba(255,79,135,.5)}.claim-item[data-status="supported"]{border-color:rgba(72,230,193,.45)}.chrono-toolbar{display:flex;gap:9px;flex-wrap:wrap;align-items:center}.chrono-toolbar .manual-input{width:92px}.event-row{display:grid;grid-template-columns:70px 1fr 120px 32px;gap:7px;align-items:center;margin-top:8px}.event-remove{border:0;background:rgba(255,79,135,.16);color:#ff9abb;border-radius:9px;height:34px}.event-add{margin-top:10px}.timeline-track{position:relative;margin:18px 0 8px;padding-left:19px;border-left:1px solid color-mix(in srgb,var(--universe-a) 45%,transparent)}.timeline-track:before{content:"";position:absolute;left:-4px;top:0;width:7px;height:7px;border-radius:50%;background:var(--universe-a);box-shadow:0 0 15px var(--universe-a)}
+@media(max-width:850px){.observatory-grid,.chrono-grid{grid-template-columns:1fr}.event-row{grid-template-columns:55px 1fr 100px 30px}}
+</style>
+</head>
+<body>
+<div class="auth-gate" id="authGate" aria-hidden="false">
+  <div class="auth-card">
+    <div class="auth-brand"><span class="auth-brand-mark"></span><span>AINIMITY</span></div>
+    <div class="auth-kicker">THE COUNCIL CHAMBER · PRIVATE SESSION</div>
+    <h2 id="authTitle">Enter the chamber.</h2>
+    <p class="auth-sub">Create a simple account with your email and your own password. Your council rulings are saved privately to that account.</p>
+    <div class="auth-tabs">
+      <button type="button" class="auth-tab active" id="loginTab">LOGIN</button>
+      <button type="button" class="auth-tab" id="registerTab">CREATE ACCOUNT</button>
+    </div>
+
+    <form class="auth-form" id="loginForm">
+      <div><label for="loginEmail">Email</label><input id="loginEmail" type="email" autocomplete="email" placeholder="you@example.com" required></div>
+      <div><label for="loginPassword">Password</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Your password" required></div>
+      <button class="auth-submit" type="submit">ENTER COUNCIL ⟡</button>
+    </form>
+
+    <form class="auth-form hidden" id="registerForm">
+      <div><label for="registerEmail">Email</label><input id="registerEmail" type="email" autocomplete="email" placeholder="you@example.com" required></div>
+      <div><label for="registerPassword">Create password</label><input id="registerPassword" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" required></div>
+      <div><label for="registerPassword2">Confirm password</label><input id="registerPassword2" type="password" autocomplete="new-password" minlength="8" placeholder="Repeat your password" required></div>
+      <button class="auth-submit" type="submit">CREATE ACCOUNT ⟡</button>
+    </form>
+
+    <div class="auth-message" id="authMessage"></div>
+    <div class="auth-note">Supabase securely verifies your password. Your private Council history and files stay tied to your account.</div>
+  </div>
+</div>
+
+
+<video id="spaceBackground" aria-hidden="true" autoplay muted loop playsinline preload="metadata"><source src="/assets/space-bg.mp4" type="video/mp4"></video>
+<div id="videoVeil" aria-hidden="true"></div>
+<canvas id="universe"></canvas>
+<canvas id="dust"></canvas>
+<canvas id="trail"></canvas>
+<div class="noise"></div>
+<div id="cursor"></div><div id="cursorRing"></div>
+
+<div id="boot">
+  <div class="boot-core"><div class="boot-orb"></div><div class="boot-text">initializing council</div></div>
+</div>
+
+<header class="topbar">
+  <div class="logo"><div class="logo-mark"></div><span>AINIMITY</span></div>
+  <nav class="nav">
+    <button class="active" data-panel="home">Home</button>
+    <button data-panel="chamber">Council</button>
+    <button data-panel="workspace">Workspace</button>
+    <button data-panel="history">Memory</button>
+    <button data-panel="games">Games</button><button data-panel="observatory">Evidence</button><button data-panel="chronoforge">Chrono</button>
+  </nav>
+  <div class="status"><i class="live-dot"></i><span id="clock">00:00:00</span><span>·</span><span id="universeStatus">NEXUS PRIME</span><div class="account-area" id="accountArea"><span class="account-pill" id="accountEmail">SIGNED OUT</span><button class="logout-btn" id="logoutBtn" type="button">LOG OUT</button></div></div>
+</header>
+
+
+<div id="warp" aria-hidden="true"><div class="warp-vignette"></div><div class="warp-core"></div><div class="warp-lines"></div></div><div id="quantumJump" aria-hidden="true"><i class="quantum-branch"></i><i class="quantum-branch"></i><i class="quantum-branch"></i><i class="quantum-branch"></i><i class="quantum-node"></i><span class="quantum-caption" id="quantumCaption">COLLAPSING WAVEFUNCTION</span></div>
+<div id="planetFlight" aria-hidden="true">
+  <div class="sun3d"><div class="sun-corona"></div><div class="sun-sphere"></div></div>
+</div>
+<div id="aiOverlay" class="ai-overlay" aria-hidden="true">
+  <button class="overlay-close" id="overlayClose" aria-label="Close AI verdict panels">×</button>
+  <div class="ai-panel-shell">
+    <div class="ai-panel-glow"></div>
+    <div class="ai-deck-head">
+      <div><span class="kicker">AI COUNCIL · FIVE DISTINCT ROLES</span><h2>Choose a mind.</h2></div>
+      <p>Five viewpoints stay visible together. Human Mind is an explicit simulation of lived-context interruption—not a claim of consciousness.</p>
+    </div>
+    <div class="ai-deck" id="aiDeck"></div>
+    <div class="ai-footer"><span id="aiConfidence">SELECTED · CONFIDENCE — 00%</span><span>AINIMITY · LIVE COUNCIL</span></div>
+  </div>
+</div>
+
+<main class="viewport">
+<section class="panel active" id="home">
+  <div class="panel-inner hero">
+    <div class="float-card fc1"><small>council status</small><b><span class="live-dot"></span> 5 roles online</b></div>
+    <div class="float-card fc2"><small>reasoning mode</small><b>adversarial + verified</b></div>
+    <div class="float-card fc3"><small>signal</small><b>confidence rising ↗</b></div>
+    <div class="float-card fc4"><small>latency</small><b id="heroLatency">— · live</b></div>
+    <div class="hero-copy">
+      <div class="eyebrow">MULTI-AGENT DECISION ENGINE · 05/05 ONLINE</div>
+      <h1>AINIMITY<span>WHEN AI DISAGREES, LET AI DEBATE.</span></h1>
+      <p>Five specialised roles collide in a living digital chamber. Strategy proposes. Engineering tests. Adversarial thinking attacks. Human Mind interrupts with human stakes. Validation decides. No averaging. One answer survives the fire.</p>
+      <div class="hero-actions">
+        <button class="btn primary" data-go="chamber">Enter the Chamber ↗</button>
+        <button class="btn" id="demoBtn">Run a Live Demo</button>
+        <button class="btn" id="cmdBtn">⌘ Command</button>
+      </div>
+      <div class="hero-meta">
+        <span class="pill">REAL-TIME VISUAL ENGINE</span><span class="pill">LOCAL MEMORY</span><span class="pill">5 ROLES</span><span class="pill">PLAYFUL MODE</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="chamber">
+  <div class="panel-inner">
+    <div class="section-title">
+      <div><div class="kicker">01 · The Council Chamber</div><h2>Let them argue.</h2></div>
+      <p>The galaxy never stops. The interface never stops. Type a dilemma and watch every mind wake up, challenge the others and converge on a verdict.</p>
+    </div>
+
+    <div class="chamber-grid">
+      <div class="glass orbit-card">
+        <div class="orbit"><svg id="orbitSvg" viewBox="0 0 760 540" preserveAspectRatio="xMidYMid meet"></svg></div>
+      </div>
+      <div class="glass debate-log">
+        <div class="log-head"><b>LIVE DEBATE STREAM</b><span id="roundState">STANDBY</span></div>
+         <div class="ai-selector" id="aiSelector" aria-label="Select an AI verdict">
+           <button class="ai-chip strategist-chip" data-ai="strategist"><i></i><span>Strategist</span><small>ANGLE</small></button>
+           <button class="ai-chip technical-chip" data-ai="technical"><i></i><span>Technical</span><small>BUILD</small></button>
+           <button class="ai-chip adversarial-chip" data-ai="adversarial"><i></i><span>Adversarial</span><small>ATTACK</small></button>
+           <button class="ai-chip human-mind-chip" data-ai="human_mind"><i></i><span>Human Mind</span><small>INTERRUPT</small></button>
+           <button class="ai-chip validator-chip" data-ai="validator"><i></i><span>Validator</span><small>SIGN</small></button>
+         </div>
+        <div class="log-list" id="logList">
+          <div class="log-item"><div class="log-icon">✦</div><div><small>SYSTEM</small><p>The council is watching. Give it something worth arguing about.</p></div></div>
+        </div>
+        <div class="verdict-card" id="verdict">
+          <div class="v-top"><span class="v-tag">Council verdict</span><span class="v-score" id="score">—%</span></div>
+          <p id="verdictText">No ruling yet.</p>
+          <div class="progress"><i id="bar"></i></div>
+          <div class="argument-summary" id="argumentSummary" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <div class="glass askbar">
+        <textarea id="dilemma" placeholder="Give the council a hard problem…">Should our hackathon ship a rules-based MVP or risk an LLM pipeline with 30 hours left?</textarea>
+        <div class="debate-context-grid">
+          <input id="rebuttal" maxlength="6000" placeholder="Your interruption / rebuttal (optional)…" aria-label="Your interruption or rebuttal">
+          <input id="evidenceUrls" maxlength="4000" placeholder="Evidence URLs, comma-separated (optional)…" aria-label="Evidence URLs">
+        </div>
+        <div class="ask-tools">
+          <div class="voice-wrap"><button class="chip voice-btn" id="voiceBtn" type="button" title="Speak your dilemma">🎙 VOICE</button><span class="voice-state" id="voiceState">READY</span></div>
+          <button class="chip active" id="quick">QUICK</button>
+          <button class="chip" id="deep">DEEP</button>
+          <button class="btn primary" id="convene">Convene ⟡</button>
+        </div>
+      </div>
+      <section class="glass file-panel" aria-labelledby="filePanelTitle">
+        <div class="file-panel-head">
+          <div><div class="kicker">PRIVATE WORKSPACE · SUPABASE STORAGE</div><h3 id="filePanelTitle">Council files</h3><p>Upload reference documents and keep them with your account. Files are private storage only; they are not sent to Gemini unless an explicit image-analysis attachment is enabled.</p></div>
+          <span class="file-private-tag">PRIVATE TO YOU</span>
+        </div>
+        <label class="file-drop" id="fileDropZone" for="councilFileInput" tabindex="0" role="button" aria-label="Choose files to upload to your private Council workspace">
+          <span class="file-drop-icon" aria-hidden="true">↑</span>
+          <span><b>Drop files here or choose from your device</b><small>PDF, Word, spreadsheets, text, images, and other reference files · up to 20 MB each</small></span>
+          <span class="file-drop-cta">CHOOSE FILES</span>
+        </label>
+        <input id="councilFileInput" type="file" multiple hidden>
+        <div class="file-status" id="fileStatus" role="status" aria-live="polite">Sign in to view your private files.</div>
+        <div class="file-list" id="fileList" aria-label="Your uploaded Council files"><div class="file-empty">Your uploaded files will appear here.</div></div>
+      </section>
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="workspace">
+  <div class="panel-inner">
+    <div class="section-title"><div><div class="kicker">02 · AInimity Workspace</div><h2>More than debate.</h2></div><p>Separate tools for research, learning, planning, creation, review, meetings, and user-controlled memory. Debate remains unchanged in its own chamber.</p></div>
+    <div class="universe-banner"><div><div class="kicker">UNIVERSE Ω-02 · NEBULA OF POSSIBILITIES</div><h3>A different physics for every question.</h3><p>You have crossed the Council's event horizon. Here ideas branch into futures, evidence becomes starlight, and every specialist is a portal to a different instrument of thought.</p></div><div class="cosmic-object" aria-label="Abstract nebula portal"></div></div>
+    <div class="workspace-layout">
+      <aside class="glass workspace-menu"><div class="kicker">SPECIALIST MODES</div><h3>Choose a tool.</h3><p>Each mode has a focused job and a transparent output. Evidence is optional, never invented.</p><div class="workspace-mode-list" id="workspaceModes" role="tablist" aria-label="Choose a Workspace mode"></div></aside>
+      <section class="glass workspace-console" aria-live="polite">
+        <div class="workspace-console-head"><div><div class="kicker" id="workspaceKicker">RESEARCH EXPEDITION</div><h3 id="workspaceTitle">Build a grounded briefing.</h3><p id="workspaceDescription">Investigate a topic, compare sources, and surface open questions.</p></div><span class="workspace-badge">SEPARATE FROM DEBATE</span></div>
+        <div class="workspace-inputs"><textarea id="workspaceTask" placeholder="Describe what you want the Workspace to do…"></textarea><textarea id="workspaceContext" placeholder="Paste notes, transcript, code, document text, or other context (optional)…"></textarea><input id="workspaceEvidence" placeholder="Public evidence URLs, comma-separated (optional)…" aria-label="Workspace evidence URLs"></div>
+        <div class="workspace-actions"><button class="btn primary" id="workspaceRun" type="button">Run Workspace ✦</button><span class="workspace-status" id="workspaceStatus">READY · SELECT A MODE</span></div>
+        <div class="workspace-output empty" id="workspaceOutput">Choose a specialist mode, add a task, and run it. Results are not silently stored.</div>
+      </section>
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="observatory">
+  <div class="panel-inner">
+    <div class="section-title"><div><div class="kicker">04 · Evidence Observatory</div><h2>Inspect what supports a claim.</h2></div><p>Upload readable evidence, extract claims, and manually review provenance, contradictions, and missing context. Reliability is a signal—not a verdict.</p></div>
+    <div class="universe-banner"><div><div class="kicker">UNIVERSE Ω-04 · EVIDENCE OBSERVATORY</div><h3>Every claim gets a trail.</h3><p>Bring a paper, guideline, report, policy, or important document into orbit. The Observatory shows what is present, what is missing, and what still needs a human reviewer.</p></div><div class="cosmic-object" aria-label="Abstract evidence observatory"></div></div>
+    <div class="observatory-grid">
+      <section class="observatory-card"><div class="kicker">MANUAL INTAKE</div><h3>Upload evidence.</h3><p>PDF text extraction is supported for documents up to 32 MB. Large files are bounded safely for model context while preserving the opening and closing sections. Scanned PDFs need OCR first.</p>
+        <label class="manual-label" for="evidenceCategory">DOCUMENT DOMAIN</label><select class="manual-select" id="evidenceCategory"><option value="healthcare">Healthcare / clinical</option><option value="research">Research / academic</option><option value="legal">Legal / policy</option><option value="financial">Financial</option><option value="technical">Technical</option><option value="news">News / journalism</option><option value="personal">Personal record</option><option value="other">Other</option></select>
+        <label class="manual-file" for="evidenceFile">Choose PDF or text document<input id="evidenceFile" type="file" accept=".pdf,.txt,.md,.csv,.json,.html,text/plain,application/pdf"></label>
+        <label class="manual-label" for="evidenceContext">REVIEW CONTEXT (OPTIONAL)</label><textarea class="manual-textarea" id="evidenceContext" placeholder="What important task is this evidence meant to inform?"></textarea>
+        <button class="btn primary" id="assessEvidence" type="button">Assess evidence ✦</button><span class="workspace-status" id="evidenceStatus">READY · HUMAN REVIEW REQUIRED</span>
+        <div class="safety-note">Healthcare and other high-impact documents receive an advisory-only notice. AInimity does not diagnose, prescribe, determine eligibility, or replace a qualified professional.</div>
+      </section>
+      <section class="observatory-card observatory-output" id="evidenceOutput"><div class="kicker">OBSERVATORY READOUT</div><h3>Nothing in orbit yet.</h3><p>Upload a document to create a manual review board.</p></section>
+    </div>
+  </div>
+</section>
+<section class="panel" id="chronoforge">
+  <div class="panel-inner">
+    <div class="section-title"><div><div class="kicker">05 · ChronoForge</div><h2>Play the decision forward.</h2></div><p>Manually place events on a timeline, advance through checkpoints, and compare branches. This is scenario playback—not a prediction engine.</p></div>
+    <div class="universe-banner"><div><div class="kicker">UNIVERSE Ω-05 · CHRONOFORGE</div><h3>Choose what happens next.</h3><p>Forge alternate futures by selecting events yourself. Every branch stays labelled as a scenario assumption so simulation never masquerades as fact.</p></div><div class="cosmic-object" aria-label="Abstract chronoforge portal"></div></div>
+    <div class="chrono-grid">
+      <section class="chrono-card"><div class="kicker">MANUAL SCENARIO FORGE</div><h3>Set the starting state.</h3>
+        <label class="manual-label" for="chronoObjective">OBJECTIVE</label><input class="manual-input" id="chronoObjective" value="Launch a controlled beta without losing safety oversight.">
+        <label class="manual-label" for="chronoInitial">INITIAL STATE</label><textarea class="manual-textarea" id="chronoInitial">The team has a working prototype, limited testing time, and a small group of beta users.</textarea>
+        <div class="chrono-toolbar"><label class="manual-label" for="chronoHorizon">HORIZON DAYS</label><input class="manual-input" id="chronoHorizon" type="number" min="1" max="3650" value="30"><button class="btn" id="addChronoEvent" type="button">+ Add event</button></div>
+        <div id="chronoEvents"></div><button class="btn primary" id="playChrono" type="button">Play Forward ✦</button><span class="workspace-status" id="chronoStatus">READY · ADD EVENTS MANUALLY</span>
+        <div class="safety-note">Simulated outcomes are not forecasts. For healthcare and other high-impact decisions, consult the appropriate qualified professional.</div>
+      </section>
+      <section class="chrono-card chrono-output" id="chronoOutput"><div class="kicker">TEMPORAL READOUT</div><h3>Timeline is waiting.</h3><p>Add events such as “new safety evidence arrives” or “critical bug appears,” then play the scenario forward.</p></section>
+    </div>
+  </div>
+</section>
+<section class="panel" id="games"><div class="panel-inner"><div class="section-title"><div><div class="kicker">03 · AInimity Arcade</div><h2>Play between thoughts.</h2></div><p>Small games, quick resets, zero accounts needed. Pick a title, learn the controls, and let the council chamber breathe.</p></div><div class="games-layout"><div class="glass games-menu"><div class="kicker">MINIATURE WORLDS</div><h3>Choose a game.</h3><p>Each game runs locally in your browser. Your score stays on this screen.</p><div class="game-nav" id="gameNav" role="tablist" aria-label="Choose a mini-game"><button class="active" data-game="pacman" role="tab"><strong>Pacman</strong><small>MAZE · COLLECT · ESCAPE</small></button><button data-game="snake" role="tab"><strong>Snake Bite</strong><small>GROW · TURN · SURVIVE</small></button><button data-game="tetris" role="tab"><strong>Tetris</strong><small>STACK · CLEAR · RISE</small></button><button data-game="bouncy" role="tab"><strong>Bouncy Tales</strong><small>BOUNCE · CATCH · FLOAT</small></button></div></div><div class="glass game-console"><div class="game-console-top"><b id="gameTitle">Pacman</b><span id="gameStatus">READY · 0</span></div><div class="game-canvas-wrap"><canvas id="gameCanvas" width="640" height="400" aria-label="AInimity mini-game canvas"></canvas></div><div class="game-hint"><span id="gameInstructions"><b>Arrow keys / WASD</b> move through the maze.</span><span id="gameScore">SCORE 0</span></div><div class="game-actions"><button type="button" id="gameStart">START / RESTART</button><button type="button" data-go="chamber">BACK TO COUNCIL ↗</button></div></div></div></div></section>
+<section class="panel" id="history">
+  <div class="panel-inner">
+    <div class="section-title">
+      <div><div class="kicker">02 · Council Memory</div><h2>Every argument leaves a trace.</h2></div>
+      <p>Rulings are stored privately on the council server under your account. Log in on another machine and your decision timeline follows your account.</p>
+    </div>
+    <div class="history-wrap">
+      <div class="glass stats">
+        <div class="kicker">SYSTEM PULSE</div>
+        <div class="stat-grid">
+          <div class="stat"><small>rulings</small><b id="statRulings">0</b></div>
+          <div class="stat"><small>avg confidence</small><b id="statConf">—</b></div>
+          <div class="stat"><small>roles</small><b>05</b></div>
+          <div class="stat"><small>debate rounds</small><b id="statRounds">0</b></div>
+        </div>
+        <button class="btn" id="clearHistory" style="margin-top:18px">Clear private memory</button>
+      </div>
+      <div class="glass timeline">
+        <div class="timeline-head"><b>DECISION TIMELINE</b><span id="memoryState">PRIVATE DATABASE</span></div>
+        <div id="historyList"><div style="color:#657089;font-size:11px;text-align:center;padding:40px 10px">No rulings yet. Convene the council.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<div class="backdrop" id="backdrop"></div>
+<div class="command" id="command">
+  <div class="cmd-box">
+    <input class="cmd-input" id="cmdInput" placeholder="Type a command… (try 'council', 'home', 'memory')" autocomplete="off">
+    <div class="cmd-actions">
+      <button data-cmd="home">⌂ Go to Home</button>
+      <button data-cmd="chamber">◈ Open Council Chamber</button>
+      <button data-cmd="workspace">✦ Open Workspace</button>
+      <button data-cmd="history">◌ Open Memory</button>
+      <button data-cmd="games">▣ Open Games</button>
+      <button data-cmd="demo">✦ Launch cinematic demo</button>
+    </div>
+  </div>
+</div>
+<div id="memoryCollapse" aria-hidden="true">
+  <div class="collapse-sheen"></div>
+  <div class="collapse-hole" aria-hidden="true"><i></i></div>
+  <div class="collapse-label">PRIVATE MEMORY · COLLAPSING</div>
+</div>
+<div class="toast" id="toast">Council online.</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ============================================================
+   ALINIMITY — cinematic single-file frontend
+   Core content is based on the supplied Council Chamber prototype:
+   four agents, dilemma input, quick/deep modes, verdict + local history.
+   ============================================================ */
+
+/* ---------- galaxy background ---------- */
+const U=document.getElementById('universe'),u=U.getContext('2d');
+const D=document.getElementById('dust'),d=D.getContext('2d');
+const T=document.getElementById('trail'),tc=T.getContext('2d');
+let pageVisible=!document.hidden;
+const prefersReducedMotion=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+let W=innerWidth,H=innerHeight, mouse={x:W/2,y:H/2}, stars=[], dust=[], trails=[];
+function resize(){
+  W=innerWidth;H=innerHeight;
+  const dpr=Math.min(1.5,window.devicePixelRatio||1);
+  [U,D,T].forEach(c=>{c.width=Math.floor(W*dpr);c.height=Math.floor(H*dpr);c.style.width=W+'px';c.style.height=H+'px'});
+  [u,d,tc].forEach(x=>x.setTransform(dpr,0,0,dpr,0,0));
+  buildSpace();
+}
+function buildSpace(){
+  stars=Array.from({length:Math.min(700,Math.floor(W*H/2200))},()=>({
+    a:Math.random()*Math.PI*2,r:60+Math.pow(Math.random(),.58)*Math.min(W,H)*.72,
+    z:.12+Math.random()*.95,s:Math.random()**2*2.2+.25,p:Math.random()*7
+  }));
+  dust=Array.from({length:Math.min(240,Math.floor(W*H/9000))},()=>({
+    x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.12,vy:(Math.random()-.5)*.12,r:.3+Math.random()*1.5,p:Math.random()*6
+  }));
+}
+function galaxy(){
+  u.clearRect(0,0,W,H);
+  u.fillStyle='#02030a';u.fillRect(0,0,W,H);
+  const cx=W/2+(mouse.x-W/2)*.035,cy=H/2+(mouse.y-H/2)*.035;
+  const bg=u.createRadialGradient(cx,cy,0,cx,cy,Math.max(W,H)*.72);
+  bg.addColorStop(0,'rgba(70,85,180,.09)');bg.addColorStop(.35,'rgba(24,40,100,.045)');bg.addColorStop(1,'rgba(0,0,0,0)');
+  u.fillStyle=bg;u.fillRect(0,0,W,H);
+
+  u.save();u.translate(cx,cy);u.rotate(-.22);
+  stars.forEach((s,i)=>{
+    const arm=Math.sin(s.a*2.35)*.22;
+    const rr=s.r*(1+arm);
+    const x=Math.cos(s.a)*rr, y=Math.sin(s.a)*rr*.58;
+    const tw=.45+.55*Math.abs(Math.sin(performance.now()*.0008+s.p));
+    const hue=i%13===0?340:(i%17===0?42:210);
+    u.fillStyle=`hsla(${hue},${hue===210?55:80}%,${78+20*s.z}%,${tw*.55*s.z})`;
+    u.beginPath();u.arc(x,y,s.s*s.z,0,Math.PI*2);u.fill();
+    if(s.s>1.5){u.fillStyle=`rgba(255,255,255,${tw*.14})`;u.beginPath();u.arc(x,y,s.s*4,0,Math.PI*2);u.fill()}
+  });
+  // luminous spiral core
+  const core=u.createRadialGradient(0,0,0,0,0,95);
+  core.addColorStop(0,'rgba(255,255,255,.95)');core.addColorStop(.06,'rgba(185,210,255,.55)');
+  core.addColorStop(.23,'rgba(130,145,255,.16)');core.addColorStop(1,'rgba(0,0,0,0)');
+  u.fillStyle=core;u.beginPath();u.arc(0,0,120,0,Math.PI*2);u.fill();
+  u.restore();
+}
+let dustRaf=0,trailRaf=0,galaxyRaf=0,lastGalaxy=0;
+function dustLoop(){
+  if(!pageVisible){dustRaf=0;return;}
+  d.clearRect(0,0,W,H);
+  dust.forEach((p,i)=>{
+    p.x+=p.vx+(mouse.x-W/2)*.00002;p.y+=p.vy;
+    if(p.x<-5)p.x=W+5;if(p.x>W+5)p.x=-5;if(p.y<-5)p.y=H+5;if(p.y>H+5)p.y=-5;
+    const a=.12+.28*Math.abs(Math.sin(performance.now()*.001+p.p));
+    d.fillStyle=`rgba(170,190,255,${a})`;d.beginPath();d.arc(p.x,p.y,p.r,0,7);d.fill();
+  });
+  dustRaf=requestAnimationFrame(dustLoop);
+}
+function trailLoop(){
+  if(!pageVisible){trailRaf=0;return;}
+  tc.clearRect(0,0,W,H);
+  trails.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.life-=.028;p.r*=.985;
+    tc.globalAlpha=Math.max(0,p.life);tc.fillStyle=p.c;tc.beginPath();tc.arc(p.x,p.y,p.r,0,7);tc.fill()});
+  tc.globalAlpha=1;trails=trails.filter(p=>p.life>0);
+  trailRaf=requestAnimationFrame(trailLoop);
+}
+function spawnTrail(x,y){
+  if(!pageVisible||trails.length>120)return;
+  trails.push({x,y,vx:(Math.random()-.5)*2.4,vy:(Math.random()-.5)*2.4,r:1+Math.random()*2,life:1,c:`hsl(${190+Math.random()*130} 90% 72%)`});
+}
+function galaxyLoop(ts){
+  if(!pageVisible){galaxyRaf=0;return;}
+  if(ts-lastGalaxy>32){galaxy();lastGalaxy=ts;}
+  galaxyRaf=requestAnimationFrame(galaxyLoop);
+}
+function restartAmbientLoops(){
+  if(!pageVisible||prefersReducedMotion)return;
+  if(!dustRaf)dustRaf=requestAnimationFrame(dustLoop);
+  if(!trailRaf)trailRaf=requestAnimationFrame(trailLoop);
+  if(!galaxyRaf)galaxyRaf=requestAnimationFrame(galaxyLoop);
+}
+addEventListener('resize',resize);resize();restartAmbientLoops();
+document.addEventListener('visibilitychange',()=>{
+  pageVisible=!document.hidden;
+  if(!pageVisible){cancelAnimationFrame(dustRaf);cancelAnimationFrame(trailRaf);cancelAnimationFrame(galaxyRaf);dustRaf=trailRaf=galaxyRaf=0;}
+  else if(!prefersReducedMotion)restartAmbientLoops();
+});
+
+/* ---------- cursor ---------- */
+const cur=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
+let lastTrailAt=0;
+addEventListener('pointermove',e=>{
+  mouse.x=e.clientX;mouse.y=e.clientY;cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';
+  ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px';
+  const now=performance.now();if(now-lastTrailAt>32){lastTrailAt=now;spawnTrail(e.clientX,e.clientY);}
+});
+document.addEventListener('mouseover',e=>{if(e.target.closest('button,textarea,input,.glass'))document.body.classList.add('hovering')});
+document.addEventListener('mouseout',e=>{if(e.target.closest('button,textarea,input,.glass'))document.body.classList.remove('hovering')});
+
+/* ---------- clock ---------- */
+setInterval(()=>document.getElementById('clock').textContent=new Date().toLocaleTimeString([], {hour12:false}),500);
+
+/* ---------- panel navigation: sliding glass sheets over permanent galaxy ---------- */
+const panels=[...document.querySelectorAll('.panel')];
+let current='home';
+function openPanel(name){
+  if(!document.getElementById(name))return;
+  panels.forEach(p=>p.classList.remove('active','prev'));
+  const nextPanel=document.getElementById(name);
+  nextPanel.scrollTop=0;
+  nextPanel.classList.add('active');
+  current=name;
+  document.dispatchEvent(new CustomEvent('ainimity:panel',{detail:name}));
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.panel===name));
+}
+/* Navigation handled by cinematicNavigate. */
+document.addEventListener('keydown',e=>{
+  const target=e.target;
+  const editing=target?.matches?.('input,textarea,select,[contenteditable="true"]');
+  if(editing)return;
+  if(e.key==='1')cinematicNavigate('home'); if(e.key==='2')cinematicNavigate('chamber'); if(e.key==='3')cinematicNavigate('history'); if(e.key==='4')cinematicNavigate('workspace'); if(e.key==='5')cinematicNavigate('games'); if(e.key==='6')cinematicNavigate('observatory'); if(e.key==='7')cinematicNavigate('chronoforge');
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();toggleCommand()}
+  if(e.key==='Escape'){closeCommand()}
+});
+
+/* ---------- chamber SVG ---------- */
+const svg=document.getElementById('orbitSvg'),NS='http://www.w3.org/2000/svg';
+const agents=[
+ {id:'strategist',name:'STRATEGIST',role:'sees the angle',color:'#6f8cff',x:120,y:125},
+ {id:'technical',name:'TECHNICAL',role:'tests the build',color:'#48e6c1',x:640,y:125},
+ {id:'adversarial',name:'ADVERSARIAL',role:'breaks it on purpose',color:'#ff4f87',x:100,y:420},
+ {id:'human_mind',name:'HUMAN MIND',role:'interrupts with stakes',color:'#a679ff',x:380,y:455},
+ {id:'validator',name:'VALIDATOR',role:'signs the verdict',color:'#ffd36a',x:660,y:420}
+];
+function el(tag,a={}){const e=document.createElementNS(NS,tag);for(const k in a)e.setAttribute(k,a[k]);return e}
+function setupOrbit(){
+  svg.innerHTML='';
+  const defs=el('defs');
+  const f=el('filter',{id:'glow'});f.appendChild(el('feGaussianBlur',{stdDeviation:'3',result:'b'}));
+  const m=el('feMerge');m.appendChild(el('feMergeNode',{in:'b'}));m.appendChild(el('feMergeNode',{in:'SourceGraphic'}));f.appendChild(m);defs.appendChild(f);
+  agents.forEach(a=>{
+    const rg=el('radialGradient',{id:'g'+a.id});
+    rg.appendChild(el('stop',{offset:'0','stop-color':'#fff'}));rg.appendChild(el('stop',{offset:'.22','stop-color':a.color}));rg.appendChild(el('stop',{offset:'1','stop-color':a.color,'stop-opacity':'0'}));defs.appendChild(rg);
+  });
+  const cg=el('radialGradient',{id:'gcore'});cg.appendChild(el('stop',{offset:'0','stop-color':'#fff'}));cg.appendChild(el('stop',{offset:'.2','stop-color':'#ffd36a'}));cg.appendChild(el('stop',{offset:'1','stop-color':'#ffd36a','stop-opacity':'0'}));defs.appendChild(cg);
+  svg.appendChild(defs);
+  // orbital rings
+  [120,175,235].forEach((r,i)=>svg.appendChild(el('ellipse',{cx:380,cy:270,rx:r*1.3,ry:r,fill:'none',stroke:'rgba(140,160,255,.12)','stroke-width':i===2?1.4:1,'stroke-dasharray':i===1?'3 8':'none'})));
+  agents.forEach(a=>{
+    svg.appendChild(el('line',{id:'line-'+a.id,x1:a.x,y1:a.y,x2:380,y2:270,stroke:a.color,'stroke-opacity':'.12','stroke-width':'1.2'}));
+    svg.appendChild(el('circle',{id:'orb-'+a.id,cx:a.x,cy:a.y,r:37,fill:'url(#g'+a.id+')',filter:'url(#glow)'}));
+    svg.appendChild(el('circle',{id:'ring-'+a.id,cx:a.x,cy:a.y,r:48,fill:'none',stroke:a.color,'stroke-opacity':'.3','stroke-width':'1'}));
+    const tx=el('text',{x:a.x,y:a.y+67,'text-anchor':'middle',class:'agent-label'});tx.textContent=a.name;svg.appendChild(tx);
+    const ts=el('text',{x:a.x,y:a.y+82,'text-anchor':'middle',class:'agent-sub'});ts.textContent=a.role;svg.appendChild(ts);
+  });
+  svg.appendChild(el('circle',{id:'core',cx:380,cy:270,r:31,fill:'url(#gcore)',filter:'url(#glow)'}));
+  const ct=el('text',{x:380,y:275,'text-anchor':'middle',class:'coreText'});ct.textContent='VERDICT';svg.appendChild(ct);
+}
+setupOrbit();
+let ot=0;
+(function orbitAnim(){ot+=.025;agents.forEach((a,i)=>{
+  const s=1+Math.sin(ot*1.4+i)*.06;
+  document.getElementById('orb-'+a.id).setAttribute('r',37*s);
+  document.getElementById('ring-'+a.id).setAttribute('r',48+Math.sin(ot+i)*3);
+});
+document.getElementById('core').setAttribute('r',31+Math.sin(ot*1.8)*3);
+requestAnimationFrame(orbitAnim)})();
+
+
+/* ---------- ALINIMITY cinematic navigation ---------- */
+const UNIVERSES={
+  home:{name:'NEXUS PRIME',caption:'RETURNING TO THE ORIGIN NEXUS'},
+  chamber:{name:'SINGULARITY COURT',caption:'CROSSING EVENT HORIZON · FIVE MINDS AHEAD'},
+  workspace:{name:'NEBULA OF POSSIBILITIES',caption:'QUANTUM BRANCH COLLAPSED · ENTERING Ω-02'},
+  history:{name:'ARCHIVE MOON',caption:'FOLLOWING THE MEMORY ORBIT'},
+  games:{name:'PULSAR ARCADE',caption:'LOCKING ONTO A PLAYFUL FREQUENCY'},
+  observatory:{name:'EVIDENCE OBSERVATORY',caption:'SCANNING CLAIMS · HUMAN REVIEW REQUIRED'},
+  chronoforge:{name:'CHRONOFORGE',caption:'ADVANCING MANUAL EVENTS THROUGH TIME'}
+};
+document.body.dataset.universe='home';
+let navigationBusy=false;
+function cinematicNavigate(name){
+  if(navigationBusy || name===current)return;
+  if(!document.getElementById(name))return;
+  navigationBusy=true;
+  const warp=document.getElementById('warp');
+  const quantum=document.getElementById('quantumJump');
+  const destination=UNIVERSES[name]||UNIVERSES.home;
+  document.getElementById('quantumCaption').textContent=destination.caption;
+  document.getElementById('universeStatus').textContent=destination.name;
+  document.body.dataset.universe=name;
+  quantum.classList.remove('active');void quantum.offsetWidth;quantum.classList.add('active');
+  warp.classList.add('active');
+  setTimeout(()=>openPanel(name),260);
+  setTimeout(()=>{warp.classList.remove('active');quantum.classList.remove('active');navigationBusy=false},940);
+}
+document.querySelectorAll('.nav button,[data-go]').forEach(el=>{
+  el.addEventListener('click',e=>{e.preventDefault();cinematicNavigate(el.dataset.panel||el.dataset.go)})
+});
+
+/* ---------- backend wiring ---------- */
+// Point this at your deployed API by opening index.html?api=https://your-backend.example.com
+// or by setting window.ALINIMITY_API_BASE before this script runs.
+const API_BASE = new URLSearchParams(location.search).get('api') || window.ALINIMITY_API_BASE || (location.protocol === 'file:' ? 'http://localhost:8000' : location.origin);
+/* ---------- Supabase account session ---------- */
+const authGate=document.getElementById('authGate');
+const authTitle=document.getElementById('authTitle');
+const authMessage=document.getElementById('authMessage');
+const loginTab=document.getElementById('loginTab');
+const registerTab=document.getElementById('registerTab');
+const loginForm=document.getElementById('loginForm');
+const registerForm=document.getElementById('registerForm');
+const loginEmailInput=document.getElementById('loginEmail');
+const loginPasswordInput=document.getElementById('loginPassword');
+const registerEmailInput=document.getElementById('registerEmail');
+const registerPasswordInput=document.getElementById('registerPassword');
+const registerPasswordConfirmInput=document.getElementById('registerPassword2');
+const accountEmail=document.getElementById('accountEmail');
+let currentUser=null;
+let supabaseClient=null;
+let storageBucket='council-documents';
+
+function authMsg(text,type=''){
+  authMessage.textContent=text;
+  authMessage.className='auth-message'+(type?' '+type:'');
+}
+function showAuth(mode='login'){
+  const isRegister=mode==='register';
+  loginTab.classList.toggle('active',!isRegister); registerTab.classList.toggle('active',isRegister);
+  loginForm.classList.toggle('hidden',isRegister); registerForm.classList.toggle('hidden',!isRegister);
+  authTitle.textContent=isRegister?'Create your council identity.':'Enter the chamber.';
+  authMsg('');
+  setTimeout(()=>document.querySelector(isRegister?'#registerEmail':'#loginEmail')?.focus(),50);
+  authGate.classList.remove('hidden'); authGate.setAttribute('aria-hidden','false');
+}
+function hideAuth(){
+  authGate.classList.add('hidden'); authGate.setAttribute('aria-hidden','true');
+}
+function setUser(user){
+  currentUser=user||null;
+  accountEmail.textContent=user?.email||'SIGNED OUT';
+}
+async function parseApiError(res){
+  try{const data=await res.json();return data.detail||data.message||`Request failed (${res.status})`;}catch(e){return `Request failed (${res.status})`;}
+}
+async function apiFetch(path,options={}){
+  const opts={...options,headers:{...(options.headers||{})}};
+  if(supabaseClient){
+    const {data:{session}}=await supabaseClient.auth.getSession();
+    if(session?.access_token) opts.headers.Authorization=`Bearer ${session.access_token}`;
+  }
+  return fetch(`${API_BASE.replace(/\/+$/,'')}${path}`,opts);
+}
+function authErrorMessage(err,action='sign in'){
+  const message=String(err?.message||err||'');
+  const lower=message.toLowerCase();
+  if(err instanceof TypeError || /failed to fetch|networkerror|load failed/i.test(message)){
+    return `Could not reach Supabase to ${action}. Check your internet connection, the Supabase project URL and publishable key in .env, and that this Supabase project is active.`;
+  }
+  if(lower.includes('invalid login credentials'))return 'Email or password is incorrect. Check both and try again.';
+  if(lower.includes('email not confirmed'))return 'Please confirm your email before signing in. Check your inbox, or disable email confirmation in Supabase Auth for a hackathon demo.';
+  if(lower.includes('supabase')&&lower.includes('key'))return 'Supabase is not configured correctly. Add the project publishable/anon key to .env and restart the backend.';
+  return message||`${action==='sign in'?'Login':'Request'} failed. Please try again.`;
+}
+async function initSupabase(){
+  const res=await fetch(`${API_BASE.replace(/\/+$/,'')}/api/config`,{cache:'no-store'});
+  if(!res.ok)throw new Error(`Backend configuration request failed (${res.status}). Start the FastAPI app and open the same-origin app URL.`);
+  const cfg=await res.json();
+  if(!cfg.supabase_configured)throw new Error(cfg.configuration_error||'Supabase is not configured. Add SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY to .env and restart the backend.');
+  if(!window.supabase?.createClient)throw new Error('The Supabase browser library did not load. Check your internet connection and allow cdn.jsdelivr.net, then reload.');
+  if(!/^https:\/\//i.test(String(cfg.supabase_url||'')))throw new Error('Supabase URL must start with https://. Check SUPABASE_URL in .env and restart the backend.');
+  storageBucket=String(cfg.supabase_storage_bucket||'council-documents').trim()||'council-documents';
+  maxDocumentBytes=Number(cfg.max_file_size_bytes)||MAX_DOCUMENT_BYTES;
+  acceptedMimeTypes=Array.isArray(cfg.allowed_mime_types)?cfg.allowed_mime_types.map(v=>String(v).toLowerCase()).filter(Boolean):[];
+  voiceRecognitionLanguage=String(cfg.voice_recognition_language||'en-IN').trim()||'en-IN';
+  supabaseClient=window.supabase.createClient(cfg.supabase_url,cfg.supabase_publishable_key,{
+    auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
+  });
+  supabaseClient.auth.onAuthStateChange((event,session)=>{
+    setUser(session?.user||null);
+    // Supabase invokes this callback during token refresh; defer network work
+    // so the auth callback never blocks or deadlocks the client.
+    if(event==='SIGNED_IN'||event==='TOKEN_REFRESHED')setTimeout(()=>{
+      if(session?.user){loadHistory();loadDocuments();}
+    },0);
+    if(event==='SIGNED_OUT'){historyData=[];renderHistory();clearDocuments();}
+  });
+}
+async function checkSession(){
+  const {data,error}=await supabaseClient.auth.getSession();
+  if(error)throw error;
+  const session=data?.session;
+  if(!session?.user){setUser(null);showAuth('login');return;}
+  // Do not discard a valid Supabase session just because the API/history check
+  // is temporarily unavailable. The protected API still verifies every token.
+  setUser(session.user);hideAuth();
+  await loadHistory();
+  await loadDocuments();
+}
+loginTab.onclick=()=>showAuth('login');
+registerTab.onclick=()=>showAuth('register');
+
+loginForm.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const button=loginForm.querySelector('button[type=submit]');
+  button.disabled=true;authMsg('Opening the chamber…');
+  try{
+    const {data,error}=await supabaseClient.auth.signInWithPassword({
+      email:loginEmailInput.value.trim(),
+      password:loginPasswordInput.value
+    });
+    if(error)throw error;
+    if(!data.user||!data.session)throw new Error('Supabase did not return a signed-in session.');
+    setUser(data.user);
+    hideAuth();
+    await loadHistory();
+    await loadDocuments();
+    loginForm.reset();
+    toast('Welcome back to the council.');
+  }catch(err){
+    authMsg(authErrorMessage(err,'sign in'),'error');
+  }finally{button.disabled=false;}
+});
+
+registerForm.addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(registerPasswordInput.value!==registerPasswordConfirmInput.value){authMsg('Passwords do not match.','error');return;}
+  const button=registerForm.querySelector('button[type=submit]');
+  button.disabled=true;authMsg('Creating your private council account…');
+  try{
+    const {data,error}=await supabaseClient.auth.signUp({
+      email:registerEmailInput.value.trim(),
+      password:registerPasswordInput.value
+    });
+    if(error)throw error;
+    if(!data.session){
+      authMsg('Account created. Check your email to confirm the account, then sign in.','success');
+      registerForm.reset();
+      showAuth('login');
+      authMsg('Check your email to confirm your account, then sign in.','success');
+      return;
+    }
+    setUser(data.user);
+    hideAuth();
+    await loadHistory();
+    await loadDocuments();
+    registerForm.reset();
+    toast('Account created. Council online.');
+  }catch(err){
+    authMsg(authErrorMessage(err,'create your account'),'error');
+  }finally{button.disabled=false;}
+});
+
+document.getElementById('logoutBtn').onclick=async()=>{
+  try{if(supabaseClient)await supabaseClient.auth.signOut();}catch(e){}
+  setUser(null);historyData=[];renderHistory();clearDocuments();showAuth('login');toast('Logged out.');
+};
+
+/* ---------- private Council documents in Supabase Storage ---------- */
+const fileInput=document.getElementById('councilFileInput');
+const fileDropZone=document.getElementById('fileDropZone');
+const fileStatus=document.getElementById('fileStatus');
+const fileList=document.getElementById('fileList');
+const MAX_DOCUMENT_BYTES=20*1024*1024;
+let maxDocumentBytes=MAX_DOCUMENT_BYTES;
+let acceptedMimeTypes=[];
+let voiceRecognitionLanguage='en-IN';
+let storedDocuments=[];
+let documentBusy=false;
+let pendingReferenceFile=null;
+let activeCouncilPayload={};
+function setFileStatus(message,type=''){
+  fileStatus.textContent=message;
+  fileStatus.className='file-status'+(type?' '+type:'');
+}
+function formatFileSize(bytes){
+  const n=Number(bytes)||0;
+  if(n<1024)return `${n} B`;
+  if(n<1024*1024)return `${(n/1024).toFixed(1)} KB`;
+  return `${(n/(1024*1024)).toFixed(1)} MB`;
+}
+function fileDisplayName(path){
+  const leaf=String(path||'').split('/').pop()||'File';
+  const split=leaf.indexOf('__');
+  return split>=0?leaf.slice(split+2):leaf;
+}
+function renderDocuments(){
+  if(!currentUser){fileList.innerHTML='<div class="file-empty">Sign in to securely access your files.</div>';return;}
+  if(!storedDocuments.length){fileList.innerHTML='<div class="file-empty">No files uploaded yet. Choose a file above to add a private reference.</div>';return;}
+  fileList.innerHTML=storedDocuments.map((item,index)=>{
+    const label=esc(fileDisplayName(item.name));
+    const metadata=item.metadata||{};
+    const size=formatFileSize(metadata.size||item.size||0);
+    const date=item.created_at?new Date(item.created_at).toLocaleDateString():'';
+    return `<div class="file-row"><div class="file-row-main"><span class="file-row-icon" aria-hidden="true">▤</span><div style="min-width:0"><div class="file-row-name" title="${label}">${label}</div><div class="file-row-meta">${esc(size)}${date?' · '+esc(date):''}</div></div></div><div class="file-row-actions"><button type="button" data-file-action="download" data-file-index="${index}" aria-label="Download ${label}">DOWNLOAD</button><button type="button" data-file-action="delete" data-file-index="${index}" aria-label="Delete ${label}">REMOVE</button></div></div>`;
+  }).join('');
+}
+function clearDocuments(){
+  storedDocuments=[];renderDocuments();
+  setFileStatus(currentUser?'Your files are private to this account.':'Sign in to view your private files.');
+}
+async function loadDocuments(){
+  if(!currentUser||!supabaseClient){clearDocuments();return;}
+  setFileStatus('Loading your private files…');
+  try{
+    const {data,error}=await supabaseClient.storage.from(storageBucket).list(currentUser.id,{
+      limit:100,offset:0,sortBy:{column:'created_at',order:'desc'}
+    });
+    if(error)throw error;
+    storedDocuments=(data||[]).filter(item=>item.name&&!item.name.startsWith('.'));
+    renderDocuments();
+    setFileStatus(storedDocuments.length?`${storedDocuments.length} private file${storedDocuments.length===1?'':'s'} · stored in Supabase`:'Your private workspace is ready. Upload a file to get started.','success');
+  }catch(err){
+    storedDocuments=[];renderDocuments();
+    console.warn('[AInimity] private file listing failed:',err);
+    setFileStatus(`Could not load files: ${storageErrorMessage(err,'list files')}`, 'error');
+  }
+}
+function safeStorageName(name){
+  const cleaned=String(name||'file').normalize('NFKC').replace(/[\\/\u0000-\u001f\u007f]/g,'-').replace(/\.\./g,'_').trim();
+  return cleaned.slice(0,180)||'file';
+}
+function newStorageId(){
+  if(window.crypto?.randomUUID)return window.crypto.randomUUID();
+  if(!window.crypto?.getRandomValues)throw new Error('This browser cannot generate a secure upload ID. Open the app over HTTPS or localhost and try again.');
+  const bytes=window.crypto.getRandomValues(new Uint8Array(16));
+  bytes[6]=(bytes[6]&0x0f)|0x40;bytes[8]=(bytes[8]&0x3f)|0x80;
+  const hex=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');
+  return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
+}
+function storageErrorMessage(err,action='upload'){
+  const raw=[err?.message,err?.error,err?.statusCode,err?.status].filter(Boolean).join(' ');
+  const lower=raw.toLowerCase();
+  const status=String(err?.statusCode||err?.status||'');
+  if(/bucket not found|unknown bucket|bucket does not exist|not a valid bucket|no such bucket/.test(lower))
+    return `Storage bucket “${storageBucket}” was not found. Run supabase/council_files_storage.sql in the Supabase SQL Editor, confirm the bucket name matches SUPABASE_STORAGE_BUCKET, then reload.`;
+  if(/invalid jwt|jwt expired|token.*expired/.test(lower))
+    return 'Your Supabase session expired. Sign out and sign in again, then retry.';
+  if(/row-level security|violates.*policy|not allowed|unauthorized|forbidden/.test(lower)||status==='401'||status==='403')
+    return `Supabase blocked this ${action} because the session or Storage policy is missing. Sign in again and apply the owner-only policies in supabase/council_files_storage.sql.`;
+  if(/payload too large|file size|maximum allowed|exceed.*limit/.test(lower)||status==='413')
+    return `This file exceeds the configured Supabase bucket limit of ${formatFileSize(maxDocumentBytes)}.`;
+  if(err instanceof TypeError||/failed to fetch|networkerror|load failed/.test(lower))
+    return `Could not reach Supabase Storage to ${action}. Check the project URL, browser network access, and that the Supabase project is active.`;
+  return raw||`Supabase Storage could not ${action} the file. Check the bucket and owner-only policies.`;
+}
+async function uploadDocuments(fileCollection){
+  if(!currentUser||!supabaseClient){setFileStatus('Sign in before uploading private files.','error');return;}
+  const {data:sessionData}=await supabaseClient.auth.getSession();
+  if(!sessionData?.session){setUser(null);showAuth('login');setFileStatus('Your session expired. Sign in again before uploading.','error');return;}
+  if(documentBusy)return;
+  const files=Array.from(fileCollection||[]);
+  if(!files.length)return;
+  const imageCandidate=files.find(file=>String(file.type||'').startsWith('image/'));
+  if(imageCandidate && imageCandidate.size<=4*1024*1024){
+    pendingReferenceFile=imageCandidate;
+    setFileStatus(`${imageCandidate.name} will be attached to the next debate for image analysis.`,'success');
+  }
+  const tooLarge=files.find(file=>file.size>maxDocumentBytes);
+  if(tooLarge){setFileStatus(`${tooLarge.name} is over the ${formatFileSize(maxDocumentBytes)} per-file limit. No files were uploaded.`, 'error');return;}
+  const disallowed=acceptedMimeTypes.length&&files.find(file=>file.type&& !acceptedMimeTypes.includes(file.type.toLowerCase()));
+  if(disallowed){setFileStatus(`${disallowed.name} has an unsupported file type (${disallowed.type||'unknown'}). No files were uploaded.`, 'error');return;}
+  documentBusy=true;fileInput.disabled=true;
+  fileDropZone.setAttribute('aria-disabled','true');
+  let uploaded=0;
+  try{
+    for(const file of files){
+      setFileStatus(`Uploading ${file.name} (${uploaded+1}/${files.length})…`);
+      const path=`${currentUser.id}/${newStorageId()}__${safeStorageName(file.name)}`;
+      const {error}=await supabaseClient.storage.from(storageBucket).upload(path,file,{
+        cacheControl:'3600',upsert:false,contentType:file.type||'application/octet-stream'
+      });
+      if(error)throw error;
+      uploaded++;
+    }
+    await loadDocuments();
+    setFileStatus(`${uploaded} file${uploaded===1?'':'s'} uploaded securely to your private workspace.`,'success');
+  }catch(err){
+    console.error('[AInimity] private file upload failed:',err);
+    setFileStatus(`${uploaded?`${uploaded} file${uploaded===1?'':'s'} uploaded. `:''}Upload failed: ${storageErrorMessage(err,'upload')}`, 'error');
+    if(uploaded)await loadDocuments();
+  }finally{
+    documentBusy=false;fileInput.disabled=false;fileDropZone.removeAttribute('aria-disabled');fileInput.value='';
+  }
+}
+fileInput.addEventListener('change',event=>uploadDocuments(event.target.files));
+fileDropZone.addEventListener('keydown',event=>{
+  if(event.key==='Enter'||event.key===' '){event.preventDefault();fileInput.click();}
+});
+for(const eventName of ['dragenter','dragover'])fileDropZone.addEventListener(eventName,event=>{
+  event.preventDefault();fileDropZone.classList.add('drag-over');
+});
+for(const eventName of ['dragleave','drop'])fileDropZone.addEventListener(eventName,event=>{
+  event.preventDefault();fileDropZone.classList.remove('drag-over');
+});
+fileDropZone.addEventListener('drop',event=>uploadDocuments(event.dataTransfer?.files));
+fileList.addEventListener('click',async event=>{
+  const button=event.target.closest('button[data-file-action]');
+  if(!button||!currentUser||documentBusy)return;
+  const item=storedDocuments[Number(button.dataset.fileIndex)];
+  if(!item?.name)return;
+  const path=`${currentUser.id}/${item.name}`;
+  documentBusy=true;
+  fileList.querySelectorAll('button').forEach(el=>el.disabled=true);
+  try{
+    if(button.dataset.fileAction==='download'){
+      setFileStatus(`Preparing ${fileDisplayName(item.name)}…`);
+      const {data,error}=await supabaseClient.storage.from(storageBucket).download(path);
+      if(error)throw error;
+      const url=URL.createObjectURL(data);
+      const anchor=document.createElement('a');anchor.href=url;anchor.download=fileDisplayName(item.name);anchor.hidden=true;
+      document.body.appendChild(anchor);anchor.click();anchor.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
+      setFileStatus('Private file downloaded.','success');
+    }else if(button.dataset.fileAction==='delete'){
+      if(!confirm(`Remove “${fileDisplayName(item.name)}” from your private Council files?`))return;
+      setFileStatus(`Removing ${fileDisplayName(item.name)}…`);
+      const {error}=await supabaseClient.storage.from(storageBucket).remove([path]);
+      if(error)throw error;
+      await loadDocuments();
+      setFileStatus('File removed from your private workspace.','success');
+    }
+  }catch(err){
+    console.error('[AInimity] private file operation failed:',err);
+    setFileStatus(`File action failed: ${storageErrorMessage(err,button.dataset.fileAction==='download'?'download':'remove')}`,'error');
+  }finally{
+    documentBusy=false;fileList.querySelectorAll('button').forEach(el=>el.disabled=false);
+  }
+});
+renderDocuments();
+
+/* Browser voice recognition: long-form, continuous transcript mode. */
+const voiceBtn=document.getElementById('voiceBtn'),voiceState=document.getElementById('voiceState');
+const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+const defaultDilemma=document.getElementById('dilemma').value;
+let recognition=null,voiceListening=false,voiceManualStop=false,voiceBase='',voiceInterim='';
+function resizeDilemma(){
+  const box=document.getElementById('dilemma');
+  box.style.height='auto';
+  box.style.height=Math.min(box.scrollHeight,260)+'px';
+}
+function stopVoiceForSubmit(){
+  if(!recognition||!voiceListening)return;
+  // Keep the latest interim words in the textarea so clicking Convene never
+  // silently drops the last part of a spoken question.
+  const box=document.getElementById('dilemma');
+  const combined=(voiceBase+' '+voiceInterim).trim();
+  if(combined){box.value=combined;box.dispatchEvent(new Event('input'));}
+  voiceManualStop=true;
+  voiceListening=false;
+  try{recognition.stop()}catch(e){}
+  voiceBtn.classList.remove('listening');
+  voiceBtn.textContent='🎙 VOICE';
+  voiceState.textContent='VOICE CAPTURE SAVED';
+}
+if(SpeechRecognition){
+  recognition=new SpeechRecognition();
+  recognition.continuous=true;
+  recognition.interimResults=true;
+  recognition.maxAlternatives=1;
+  recognition.lang=voiceRecognitionLanguage;
+  recognition.onstart=()=>{
+    const box=document.getElementById('dilemma');
+    if(box.value.trim()===defaultDilemma.trim())box.value='';
+    voiceBase=box.value.trim();
+    voiceInterim='';
+    voiceListening=true;voiceManualStop=false;
+    voiceBtn.classList.add('listening');voiceBtn.textContent='■ STOP';voiceState.textContent='LISTENING · LONG INPUT';
+  };
+  recognition.onresult=e=>{
+    let finalChunk='';
+    let interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const text=e.results[i][0].transcript.trim();
+      if(e.results[i].isFinal)finalChunk+=`${text} `;else interim+=text+' ';
+    }
+    if(finalChunk.trim())voiceBase=(voiceBase+' '+finalChunk.trim()).trim();
+    voiceInterim=interim.trim();
+    const box=document.getElementById('dilemma');
+    const combined=(voiceBase+' '+voiceInterim).trim();
+    if(combined)box.value=combined;
+    box.dispatchEvent(new Event('input'));
+    voiceState.textContent=voiceInterim?`LISTENING · ${voiceInterim.slice(0,34).toUpperCase()}`:'LISTENING · LONG INPUT';
+  };
+  recognition.onerror=e=>{
+    if(e.error==='aborted')return;
+    if(e.error==='not-allowed'||e.error==='service-not-allowed'){
+      voiceListening=false;voiceManualStop=true;
+      voiceState.textContent='MIC BLOCKED';
+      toast('Microphone permission was denied.');
+    }else{
+      voiceState.textContent='RECONNECTING…';
+    }
+  };
+  recognition.onend=()=>{
+    if(voiceListening&&!voiceManualStop){
+      voiceState.textContent='RECONNECTING…';
+      setTimeout(()=>{if(voiceListening&&!voiceManualStop){try{recognition.start()}catch(e){}}},180);
+      return;
+    }
+    voiceListening=false;voiceBtn.classList.remove('listening');voiceBtn.textContent='🎙 VOICE';
+    if(voiceState.textContent!=='MIC BLOCKED')voiceState.textContent='READY';
+  };
+  voiceBtn.onclick=()=>{
+    if(voiceListening){stopVoiceForSubmit();}
+    else{
+      voiceManualStop=false;
+      try{recognition.start()}catch(e){toast('Voice input is already starting.');}
+    }
+  };
+}else{
+  voiceBtn.disabled=true;voiceState.textContent='UNAVAILABLE';voiceBtn.title='This browser does not expose SpeechRecognition.';
+}
+
+
+/* ---------- five AI verdict panels ---------- */
+const aiProfiles={
+ strategist:{title:'Strategist',role:'Sees the angle before the move.',color:'#6f8cff',kicker:'01 · STRATEGIC VERDICT',confidence:88,lines:[['OPENING READ','The strongest path is the one the audience understands immediately.'],['STRATEGIC SIGNAL','Lead with the problem, reveal the working proof, then expose the deeper intelligence.'],['RECOMMENDATION','Protect the core experience and keep ambitious capabilities behind a controlled switch.']]},
+ technical:{title:'Technical',role:'Tests what can actually survive the click.',color:'#48e6c1',kicker:'02 · TECHNICAL VERDICT',confidence:91,lines:[['SYSTEM READ','The demo should have a deterministic path even when a live dependency becomes unavailable.'],['ENGINEERING SIGNAL','Keep state transitions explicit, cache fragile calls, and make every visual layer degrade gracefully.'],['RECOMMENDATION','Ship the reliable core first; add live intelligence as an isolated enhancement.']]},
+ adversarial:{title:'Adversarial',role:'Looks for the failure hiding behind the demo.',color:'#ff4f87',kicker:'03 · ADVERSARIAL VERDICT',confidence:84,lines:[['ATTACK SURFACE','A beautiful interface is not proof that the underlying decision path is robust.'],['FAILURE TEST','Ask what happens when the model times out, contradicts another model, or receives malformed input.'],['RECOMMENDATION','Design the failure state as deliberately as the success state and rehearse the fallback.']]},
+ human_mind:{title:'Human Mind',role:'Interrupts with human stakes and lived context.',color:'#a679ff',kicker:'04 · HUMAN INTERRUPTION',confidence:79,lines:[['HUMAN POV','A simulated human interlocutor can surface values, emotions, and social consequences that specialist roles skip.'],['INTERRUPTION','Ask what a real person would fear, feel, misunderstand, or refuse before the ruling is signed.'],['BOUNDARY','This is a bounded simulation—not consciousness or a substitute for the user.']]},
+ validator:{title:'Validator',role:'Signs the evidence when the argument converges.',color:'#ffd36a',kicker:'05 · VALIDATOR VERDICT',confidence:93,lines:[['EVIDENCE READ','A defensible decision connects the user question, the competing reasoning, and the final evidence.'],['VALIDATION SIGNAL','Confidence should reflect traceable evidence rather than agreement alone.'],['RECOMMENDATION','Expose the reasoning trail and preserve the five distinct viewpoints before presenting the final ruling.']]}
+};
+const overlay=document.getElementById('aiOverlay'),aiDeck=document.getElementById('aiDeck'),aiConfidence=document.getElementById('aiConfidence');
+let selectedAI='strategist';
+function renderAIDeck(selected){
+  selectedAI=selected||selectedAI;
+  aiDeck.innerHTML='';
+  Object.entries(aiProfiles).forEach(([id,profile],index)=>{
+    const card=document.createElement('button');
+    card.type='button';card.className='ai-deck-card'+(id===selectedAI?' selected':'');card.dataset.ai=id;card.style.setProperty('--card-color',profile.color);card.setAttribute('aria-label','Open '+profile.title+' verdict');
+    card.innerHTML=`<div class="ai-card-top"><span class="ai-card-number">${String(index+1).padStart(2,'0')} · ${profile.kicker.split('·')[1].trim()}</span><span class="ai-open-label">OPEN ↗</span></div><div class="ai-card-title">${profile.title}</div><div class="ai-card-role">${profile.role}</div><div class="ai-card-orb"></div><div class="ai-card-lines">${profile.lines.map(line=>`<div class="ai-card-line"><small>${line[0]}</small><p>${line[1]}</p></div>`).join('')}</div><div class="ai-card-foot">CONFIDENCE · ${profile.confidence}%</div>`;
+    card.setAttribute('aria-current',id===selectedAI?'true':'false');
+    card.addEventListener('click',()=>openAIVerdict(id));
+    aiDeck.appendChild(card);
+  });
+  const profile=aiProfiles[selectedAI];
+  aiConfidence.textContent=`SELECTED · ${profile.title.toUpperCase()} · CONFIDENCE — ${profile.confidence}%`;
+}
+function openAIVerdict(id){
+  const profile=aiProfiles[id];if(!profile)return;
+  selectedAI=id;
+  document.querySelectorAll('.ai-chip').forEach(b=>b.classList.toggle('selected',b.dataset.ai===id));
+  if(current!=='chamber')openPanel('chamber');
+  if(overlay.classList.contains('open')){
+    renderAIDeck(id);
+    requestAnimationFrame(()=>{
+      const selectedCard=aiDeck.querySelector(`[data-ai="${id}"]`);
+      selectedCard?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+      selectedCard?.focus({preventScroll:true});
+    });
+    return;
+  }
+  const warp=document.getElementById('warp'),sunFlight=document.getElementById('planetFlight');
+  warp.classList.add('active');sunFlight.classList.add('active');
+  setTimeout(()=>{renderAIDeck(id);overlay.classList.add('open');overlay.setAttribute('aria-hidden','false')},430);
+  setTimeout(()=>{warp.classList.remove('active');sunFlight.classList.remove('active')},920);
+}
+document.querySelectorAll('.ai-chip').forEach(btn=>btn.addEventListener('click',()=>openAIVerdict(btn.dataset.ai)));
+document.getElementById('overlayClose').onclick=()=>{overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');document.querySelectorAll('.ai-deck-card').forEach(c=>c.classList.remove('selected'))};
+window.addEventListener('keydown',e=>{if(e.key==='Escape'&&overlay.classList.contains('open'))document.getElementById('overlayClose').click()});
+
+overlay.addEventListener('click',e=>{if(e.target===overlay)document.getElementById('overlayClose').click()});
+
+/* ---------- live council engine ---------- */
+// Explicit runtime state. The original prototype relied on implicit browser
+// globals, which are not guaranteed (and caused `running is not defined`).
+// Keep these references explicit so Convene works consistently in Chrome,
+// deployed hosts, and strict browser environments.
+const state=document.getElementById('roundState');
+const log=document.getElementById('logList');
+const order=agents.map(a=>a.id);
+let mode='quick';
+let rounds=0;
+let running=false;
+
+const OFFLINE_LINES={
+  strategist:'Mapping the decision space and identifying the strongest path.',
+  technical:'Testing feasibility, dependencies, and implementation risk.',
+  adversarial:'Stress-testing the proposal for hidden failure modes.',
+  human_mind:'Interrupting with human values, lived context, and practical consequences.',
+  validator:'Comparing the evidence and preparing the final ruling.'
+};
+
+function pick(items){return items[Math.floor(Math.random()*items.length)] ?? ''; }
+
+function pulseAgent(id){
+  const circle=document.getElementById('orb-'+id);
+  const ring=document.getElementById('ring-'+id);
+  const chip=document.querySelector(`.ai-chip[data-ai=\"${id}\"]`);
+  if(circle){
+    circle.style.transition='r .22s ease, opacity .22s ease';
+    circle.setAttribute('r','44');
+    setTimeout(()=>circle.setAttribute('r','37'),260);
+  }
+  if(ring){
+    ring.style.transition='r .35s ease, opacity .35s ease';
+    ring.setAttribute('r','58');
+    setTimeout(()=>ring.setAttribute('r','48'),360);
+  }
+  if(chip){
+    chip.classList.add('selected');
+    setTimeout(()=>chip.classList.remove('selected'),700);
+  }
+}
+
+function addLog(agent,message){
+  if(!log)return;
+  const meta=agents.find(a=>a.id===agent);
+  const item=document.createElement('div');
+  item.className='log-item';
+  item.innerHTML=`<div class=\"log-icon\"${meta?` style=\"color:${meta.color}\"`:''}>✦</div><div><small>${esc((meta?.name||agent||'SYSTEM').toUpperCase())}</small><p>${esc(message||'Analysis complete.')}</p></div>`;
+  log.appendChild(item);
+  log.scrollTop=log.scrollHeight;
+}
+
+// Pushes the real backend result's per-agent text into the verdict
+// deck (aiProfiles) so "OPEN ↗" on each card shows the actual debate,
+// not the static placeholder copy it ships with.
+function applyCouncilResult(result){
+  Object.entries(result.cards||{}).forEach(([id,card])=>{
+    if(!aiProfiles[id])return;
+    aiProfiles[id].kicker=card.kicker;
+    aiProfiles[id].confidence=card.confidence;
+    aiProfiles[id].lines=card.lines;
+  });
+  if(typeof overlay!=='undefined'&&overlay.classList.contains('open'))renderAIDeck(selectedAI);
+}
+function renderArgumentSummary(result){
+  const el=document.getElementById('argumentSummary');
+  if(!el)return;
+  const graph=result?.argument_graph;
+  const sources=(result?.evidence||[]).filter(x=>x.status==='retrieved');
+  if(!graph){el.textContent='';return;}
+  el.innerHTML=`<b>ARGUMENT GRAPH</b> · ${graph.stats?.nodes||0} nodes · ${graph.stats?.edges||0} links · ${sources.length} verified source${sources.length===1?'':'s'}`;
+}
+
+function councilErrorMessage(err){
+  const message=String(err?.message||err||'');
+  const lower=message.toLowerCase();
+  if(lower.includes('401')||lower.includes('unauthorized')||lower.includes('invalid or expired'))return 'Your Supabase session is missing or expired. Sign in again, then retry this feature.';
+  if(lower.includes('404')&&lower.includes('request failed'))return 'This feature route is not available on the running backend. Restart FastAPI from the project root so the latest routes are loaded.';
+  if(lower.includes('422'))return 'The server rejected the input shape. Check that the required fields are filled and retry.';
+  if((lower.includes('404')||lower.includes('not_found')||lower.includes('no longer available'))&&lower.includes('model'))
+    return 'The configured Gemini model is unavailable for this API project. Set GEMINI_MODEL=gemini-3.8-flash in .env, restart FastAPI, and try Convene again.';
+  if(lower.includes('no api key configured')||lower.includes('missing')&&lower.includes('gemini'))
+    return 'Gemini is not configured. Add a shared Gemini API key or the four role-specific Gemini keys to .env, restart FastAPI, and try again.';
+  if(lower.includes('quota')||lower.includes('resource_exhausted')||lower.includes('429'))
+    return 'Gemini quota is exhausted or rate-limited. Check the Google AI project quota, then retry.';
+  if(lower.includes('503')||lower.includes('unavailable')||lower.includes('timeout'))
+    return 'Gemini is temporarily unavailable. Retry in a few seconds; your uploaded file remains private and was not analyzed.';
+  if(lower.includes('uploaded')||lower.includes('reference'))
+    return `${message} Uploaded files are private references until an image-aware analysis is explicitly attached.`;
+  if(lower.includes('corrupted, encrypted, or image-only')||lower.includes('no readable text')||lower.includes('scanned pdf'))
+    return 'No readable PDF text was extracted. The file may be scanned/image-only, encrypted, or corrupted. Use an OCR-enabled PDF or export a readable PDF/TXT file, then retry.';
+  return message||'Council API is unavailable.';
+}
+
+function councilOutcome(result, startedAt, source='live'){
+  if(!result||typeof result.final_verdict!=='string'||!result.final_verdict.trim()||!result.cards||typeof result.cards!=='object')
+    throw new Error('Council returned an incomplete ruling. No answer was displayed.');
+  const latency=Math.max(1,Math.round(performance.now()-startedAt));
+  const latencyEl=document.getElementById('heroLatency');
+  if(latencyEl)latencyEl.textContent=`${latency}ms · ${source}`;
+  applyCouncilResult(result);
+  renderArgumentSummary(result);
+  return {
+    conf:Math.max(0,Math.min(100,Number.isFinite(Number(result.final_confidence))?Number(result.final_confidence):0)),
+    verdictText:result.final_verdict.trim(),
+    rounds:Number(result.rounds||1)
+  };
+}
+
+async function buildCouncilPayload(q){
+  const payload={dilemma:q, mode, rebuttal:document.getElementById('rebuttal')?.value.trim()||null};
+  const rawUrls=document.getElementById('evidenceUrls')?.value||'';
+  payload.evidence_urls=rawUrls.split(',').map(x=>x.trim()).filter(Boolean).slice(0,8);
+  if(pendingReferenceFile && pendingReferenceFile.size<=4*1024*1024 && String(pendingReferenceFile.type||'').startsWith('image/')){
+    const buffer=await pendingReferenceFile.arrayBuffer();
+    let binary='';const bytes=new Uint8Array(buffer);
+    for(let i=0;i<bytes.length;i+=0x8000)binary+=String.fromCharCode(...bytes.subarray(i,i+0x8000));
+    payload.reference_image_base64=btoa(binary);payload.reference_image_mime_type=pendingReferenceFile.type;
+  }
+  return payload;
+}
+
+async function runClassicCouncil(payload, startedAt){
+  // Non-streaming fallback for hosts/proxies that reject Server-Sent Events.
+  // Receive the exact payload from this Convene click; never reuse stale state.
+  const res=await apiFetch('/api/council/convene',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Accept':'application/json'},
+    body:JSON.stringify(payload)
+  });
+  if(!res.ok)throw new Error(`Council API returned ${res.status}: ${await parseApiError(res)}`);
+  const result=await res.json();
+  return councilOutcome(result,startedAt,'fallback');
+}
+
+async function runViaBackend(payload){
+  const startedAt=performance.now();
+  let res;
+  try{
+    res=await apiFetch('/api/council/stream',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'text/event-stream'},
+      body:JSON.stringify(payload)
+    });
+  }catch(err){
+    // Network/proxy failure: try the ordinary JSON endpoint before giving up.
+    return runClassicCouncil(payload,startedAt);
+  }
+
+  // Some hosting layers do not implement SSE POST requests and return 404,
+  // 405, 408, 415, 500, or 501 even though the normal FastAPI endpoint works.
+  if([404,405,408,415,500,501,502,503].includes(res.status)){
+    return runClassicCouncil(payload,startedAt);
+  }
+  if(!res.ok){
+    throw new Error(`Council API returned ${res.status}: ${await parseApiError(res)}`);
+  }
+  if(!res.body){
+    return runClassicCouncil(payload,startedAt);
+  }
+
+  try{
+    const reader=res.body.getReader();
+    const decoder=new TextDecoder();
+    let buffer='';
+    let finalResult=null;
+    const processChunk=chunk=>{
+      const line=chunk.split('\n').find(x=>x.startsWith('data: '));
+      if(!line)return;
+      const event=JSON.parse(line.slice(6));
+      if(event.event==='status'){
+        state.textContent=String(event.message||'DEBATING…').toUpperCase();
+      }else if(event.event==='agent'){
+        pulseAgent(event.agent);
+        addLog(event.agent,event.headline||'Analysis complete.');
+        state.textContent=`${event.agent.toUpperCase()} · ROUND ${event.round}`;
+      }else if(event.event==='complete'){
+        finalResult=event.result;
+      }else if(event.event==='error'){
+        throw new Error(event.message||'Council failed.');
+      }
+    };
+    while(true){
+      const {value,done}=await reader.read();
+      if(done)break;
+      buffer+=decoder.decode(value,{stream:true});
+      const chunks=buffer.split('\n\n');
+      buffer=chunks.pop()||'';
+      for(const chunk of chunks)processChunk(chunk);
+    }
+    // Be tolerant of a proxy/server that closes the stream without the final
+    // blank line.
+    if(buffer.trim())processChunk(buffer);
+    if(!finalResult)throw new Error('Council stream ended before a ruling was produced.');
+    return councilOutcome(finalResult,startedAt,'live');
+  }catch(err){
+    // Only retry through JSON when the stream failed before completing. This
+    // avoids duplicating a completed council run while handling proxy glitches.
+    if(!finalResult && String(err?.message||'').includes('stream ended before a ruling')){
+      return runClassicCouncil(payload,startedAt);
+    }
+    throw err;
+  }
+}
+
+async function convene(){
+  if(running)return;
+  // A live SpeechRecognition session can keep changing the textarea while the
+  // user clicks Convene. Stop it first and submit the complete captured text.
+  if(voiceListening)stopVoiceForSubmit();
+  const box=document.getElementById('dilemma');
+  const q=box.value.trim();
+  if(q.length<3){toast('Give the council a little more to work with.');box.focus();return;}
+  running=true;
+  const button=document.getElementById('convene');
+  button.disabled=true;button.textContent='Council is thinking…';
+  document.getElementById('verdict').classList.remove('show');
+  document.getElementById('bar').style.width='0%';
+  state.textContent='COUNCIL ENGAGED…';log.innerHTML='';
+
+  try{
+    activeCouncilPayload=await buildCouncilPayload(q);
+    const outcome=await runViaBackend(activeCouncilPayload);
+    document.getElementById('score').textContent=outcome.conf+'%';
+    document.getElementById('verdictText').textContent=outcome.verdictText;
+    document.getElementById('verdict').classList.add('show');
+    setTimeout(()=>document.getElementById('bar').style.width=outcome.conf+'%',30);
+    state.textContent=`VERDICT · ${outcome.rounds} ROUND${outcome.rounds>1?'S':''}`;
+    rounds+=outcome.rounds;
+    await loadHistory();
+    box.value='';
+    const rebuttal=document.getElementById('rebuttal');if(rebuttal)rebuttal.value='';
+    const evidenceUrls=document.getElementById('evidenceUrls');if(evidenceUrls)evidenceUrls.value='';
+    pendingReferenceFile=null;
+    box.dispatchEvent(new Event('input'));
+    box.focus();
+  }catch(err){
+    console.warn('[AInimity] council request failed:',err);
+    if(String(err.message||'').includes('401')){
+      setUser(null);showAuth('login');toast('Your session expired. Please log in again.');
+    }else{
+      toast(councilErrorMessage(err));
+      state.textContent='READY · TRY AGAIN';
+    }
+  }finally{
+    button.disabled=false;button.textContent='Convene ⟡';running=false;
+  }
+}
+
+// Chat-style keyboard control: Ctrl/Cmd+Enter sends, Shift+Enter keeps a new line.
+document.getElementById('dilemma').addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();convene();}
+});
+document.getElementById('dilemma').addEventListener('input',resizeDilemma);
+resizeDilemma();
+
+document.getElementById('convene').onclick=convene;
+document.getElementById('quick').onclick=()=>{mode='quick';document.getElementById('quick').classList.add('active');document.getElementById('deep').classList.remove('active')}
+document.getElementById('deep').onclick=()=>{mode='deep';document.getElementById('deep').classList.add('active');document.getElementById('quick').classList.remove('active')}
+
+/* ---------- separate multi-mode workspace ---------- */
+const WORKSPACE_MODES={
+  research:{label:'Research Expedition',short:'QUASAR · BRIEFING',kicker:'RESEARCH EXPEDITION',title:'Build a grounded briefing.',description:'Investigate a topic, compare sources, and surface open questions.',placeholder:'What topic should the research expedition investigate?'} ,
+  decision_matrix:{label:'Decision Matrix',short:'ORBIT · SCORE',kicker:'DECISION MATRIX',title:'Compare options with clear criteria.',description:'Make trade-offs visible and select the best-fit path.',placeholder:'Which options should be compared, and what matters most?'},
+  tutor:{label:'Socratic Tutor',short:'AURORA · PRACTICE',kicker:'SOCRATIC TUTOR',title:'Learn by thinking out loud.',description:'Diagnose understanding, explain clearly, and give the next practice step.',placeholder:'What would you like to learn, and what do you already know?'},
+  document_intelligence:{label:'Document Intelligence',short:'EXTRACT · FLAG',kicker:'DOCUMENT INTELLIGENCE',title:'Turn dense text into signal.',description:'Extract facts, obligations, ambiguities, risks, and next questions.',placeholder:'What should be extracted or reviewed in this document?'},
+  idea_incubator:{label:'Idea Incubator',short:'CREATE · VALIDATE',kicker:'IDEA INCUBATOR',title:'Grow a rough idea into a testable concept.',description:'Shape the user, value proposition, prototype, experiment, and risks.',placeholder:'Describe the seed of the idea you want to develop.'},
+  code_review:{label:'Code Review',short:'CODE · HARDEN',kicker:'CODE REVIEW',title:'Find what will break before users do.',description:'Review correctness, security, performance, maintainability, and tests.',placeholder:'Paste code or describe the code change to review.'},
+  meeting:{label:'Meeting Assistant',short:'DECISIONS · ACTIONS',kicker:'MEETING ASSISTANT',title:'Turn conversation into momentum.',description:'Extract decisions, owners, deadlines, unresolved questions, and follow-up copy.',placeholder:'Paste meeting notes or a transcript.'},
+  memory_lab:{label:'Memory Lab',short:'GOALS · CONTEXT',kicker:'MEMORY LAB',title:'Build a user-controlled operating snapshot.',description:'Organize goals and decisions without silently saving or inferring sensitive traits.',placeholder:'What goals, projects, preferences, or decisions should be organized?'}
+};
+let workspaceMode='research';
+const workspaceState=Object.fromEntries(Object.keys(WORKSPACE_MODES).map(mode=>[mode,{
+  input:'',context:'',evidenceUrls:'',result:null,error:null,loading:false,requestId:0
+}]));
+const workspaceModesEl=document.getElementById('workspaceModes'),workspaceRun=document.getElementById('workspaceRun'),workspaceOutput=document.getElementById('workspaceOutput');
+const workspaceTaskEl=document.getElementById('workspaceTask'),workspaceContextEl=document.getElementById('workspaceContext'),workspaceEvidenceEl=document.getElementById('workspaceEvidence'),workspaceStatusEl=document.getElementById('workspaceStatus');
+function activeWorkspaceState(){return workspaceState[workspaceMode]}
+function saveWorkspaceDraft(){
+  const state=activeWorkspaceState();
+  state.input=workspaceTaskEl.value;state.context=workspaceContextEl.value;state.evidenceUrls=workspaceEvidenceEl.value;
+}
+function renderWorkspaceResult(mode,result){
+  const confidence=Math.max(0,Math.min(100,Math.round(Number(result.confidence||0)*100)));
+  const sections=(result.sections||[]).map(section=>`<article class="workspace-section"><h4>${esc(section.title)}</h4><p>${esc(section.content)}</p>${(section.bullets||[]).length?`<ul>${section.bullets.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}</article>`).join('');
+  const actions=(result.action_items||[]).length?`<div class="workspace-section"><h4>NEXT ACTIONS</h4><ul class="workspace-actions-list">${result.action_items.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:'';
+  const caveats=(result.caveats||[]).map(x=>`<div class="workspace-caveat">CAUTION · ${esc(x)}</div>`).join('');
+  const citations=(result.citations||[]).length?`<div class="workspace-citations">GROUNDED SOURCES · ${result.citations.map(x=>esc(x.source_id||'source')).join(' · ')}</div>`:'';
+  workspaceOutput.className='workspace-output';
+  workspaceOutput.innerHTML=`<div class="workspace-meta"><span>${esc(WORKSPACE_MODES[mode]?.label||mode)}</span><span class="confidence">CALIBRATED CONFIDENCE · ${confidence}%</span></div><div class="workspace-summary">${esc(result.summary||'No summary returned.')}</div>${sections}${actions}${caveats}${citations}`;
+}
+function renderWorkspaceState(mode=workspaceMode){
+  const state=workspaceState[mode],m=WORKSPACE_MODES[mode];
+  workspaceTaskEl.value=state.input;workspaceContextEl.value=state.context;workspaceEvidenceEl.value=state.evidenceUrls;
+  workspaceRun.disabled=state.loading;
+  workspaceRun.textContent=state.loading?'Workspace is thinking…':'Run Workspace ✦';
+  if(state.loading){workspaceStatusEl.textContent='RUNNING · '+m.label.toUpperCase();workspaceOutput.className='workspace-output empty';workspaceOutput.textContent='Collecting the requested analysis for '+m.label+'…';return}
+  if(state.error){workspaceStatusEl.textContent='ERROR · TRY AGAIN';workspaceOutput.className='workspace-output empty';workspaceOutput.textContent=state.error;return}
+  if(state.result){workspaceStatusEl.textContent='COMPLETE · '+m.label.toUpperCase();renderWorkspaceResult(mode,state.result);return}
+  workspaceStatusEl.textContent='READY · '+m.label.toUpperCase();workspaceOutput.className='workspace-output empty';workspaceOutput.textContent='Choose a specialist mode, add a task, and run it. Results stay in this mode only.';
+}
+function selectWorkspaceMode(next){
+  if(!WORKSPACE_MODES[next])return;
+  saveWorkspaceDraft();
+  workspaceMode=next;
+  const m=WORKSPACE_MODES[next];
+  workspaceModesEl.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.workspaceMode===next));
+  document.getElementById('workspaceKicker').textContent=m.kicker;
+  document.getElementById('workspaceTitle').textContent=m.title;
+  document.getElementById('workspaceDescription').textContent=m.description;
+  workspaceTaskEl.placeholder=m.placeholder;
+  renderWorkspaceState(next);
+}
+Object.entries(WORKSPACE_MODES).forEach(([id,m])=>{
+  const b=document.createElement('button');b.type='button';b.className='workspace-mode';b.dataset.workspaceMode=id;b.setAttribute('role','tab');
+  b.innerHTML=`<strong>${esc(m.label)}</strong><small>${esc(m.short)}</small>`;
+  b.onclick=()=>selectWorkspaceMode(id);workspaceModesEl.appendChild(b);
+});
+[workspaceTaskEl,workspaceContextEl,workspaceEvidenceEl].forEach(input=>input.addEventListener('input',saveWorkspaceDraft));
+async function runWorkspace(){
+  const state=activeWorkspaceState();
+  if(state.loading)return;
+  saveWorkspaceDraft();
+  const task=state.input.trim();
+  if(task.length<3){toast('Give the Workspace a little more to work with.');workspaceTaskEl.focus();return;}
+  const requestMode=workspaceMode,requestId=++state.requestId;
+  const payload={mode:requestMode,task,context:state.context.trim()||null,evidence_urls:state.evidenceUrls.split(',').map(x=>x.trim()).filter(Boolean).slice(0,8),audience:'The signed-in AInimity user'};
+  state.loading=true;state.error=null;renderWorkspaceState(requestMode);
+  try{
+    const res=await apiFetch('/api/workspace',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload)});
+    if(!res.ok)throw new Error(`Workspace API returned ${res.status}: ${await parseApiError(res)}`);
+    const result=await res.json();
+    if(result.mode!==requestMode||!result.summary||!Array.isArray(result.sections))throw new Error('Workspace returned an incomplete result. No answer was displayed.');
+    if(state.requestId!==requestId)return;
+    state.result=result;state.error=null;
+  }catch(err){
+    if(state.requestId!==requestId)return;
+    console.warn('[AInimity] workspace request failed:',err);state.error=councilErrorMessage(err);
+  }finally{
+    if(state.requestId===requestId){state.loading=false;if(workspaceMode===requestMode)renderWorkspaceState(requestMode)}
+  }
+}
+workspaceRun.onclick=runWorkspace;
+selectWorkspaceMode('research');
+
+/* ---------- server-side per-user history ---------- */
+let historyData=[];
+async function loadHistory(){
+  if(!currentUser){historyData=[];renderHistory();return;}
+  try{
+    const res=await apiFetch('/api/history');
+    if(!res.ok)throw new Error(await parseApiError(res));
+    const data=await res.json();
+    historyData=(data.items||[]).map(x=>({
+      id:x.id,q:x.dilemma,v:x.verdict,conf:x.confidence,r:x.rounds,
+      t:new Date(x.created_at).toLocaleString()
+    }));
+    renderHistory();
+  }catch(err){console.warn('[AInimity] history load failed:',err);}
+}
+function renderHistory(){
+  const list=document.getElementById('historyList');
+  document.getElementById('statRulings').textContent=historyData.length;
+  document.getElementById('statRounds').textContent=historyData.reduce((s,x)=>s+x.r,0);
+  document.getElementById('statConf').textContent=historyData.length?Math.round(historyData.reduce((s,x)=>s+x.conf,0)/historyData.length)+'%':'—';
+  if(!historyData.length){list.innerHTML='<div style="color:#657089;font-size:11px;text-align:center;padding:40px 10px">No rulings yet. Convene the council.</div>';return}
+  list.innerHTML=historyData.map(h=>`<div class="history-item"><small>${h.t} · ${h.conf}% CONFIDENCE · ${h.r} ROUND${h.r>1?'S':''}</small><b>${esc(h.q)}</b><p>${esc(h.v)}</p></div>`).join('');
+}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+const memoryCollapse=document.getElementById('memoryCollapse');
+function seedMemoryParticles(){
+  memoryCollapse.querySelectorAll('.collapse-particle').forEach(p=>p.remove());
+  const colors=['#b9c9ff','#ff9bc1','#7ff4d9','#ffe39a'];
+  for(let i=0;i<34;i++){
+    const p=document.createElement('i');p.className='collapse-particle';
+    p.style.setProperty('--angle',`${Math.round((360/34)*i+(Math.random()*12-6))}deg`);
+    p.style.setProperty('--delay',`${(Math.random()*.32).toFixed(2)}s`);
+    p.style.setProperty('--duration',`${(1.05+Math.random()*.55).toFixed(2)}s`);
+    p.style.setProperty('--orbit',`clamp(100px,${18+Math.random()*18}vw,${180+Math.random()*180}px)`);
+    p.style.color=colors[i%colors.length];
+    memoryCollapse.appendChild(p);
+  }
+}
+async function collapseMemory(){
+  if(memoryCollapse.classList.contains('active')||!currentUser)return;
+  const items=[...document.querySelectorAll('#historyList .history-item')];
+  const centerX=innerWidth/2,centerY=innerHeight/2;
+  document.body.classList.add('memory-collapsing');
+  memoryCollapse.setAttribute('aria-hidden','false');
+  seedMemoryParticles();
+  memoryCollapse.classList.add('active');
+  document.getElementById('clearHistory').disabled=true;
+  document.getElementById('memoryState').textContent='COLLAPSING INTO CORE';
+  items.forEach((item,i)=>{
+    const r=item.getBoundingClientRect();
+    item.style.setProperty('--sink-x',`${centerX-(r.left+r.width/2)}px`);
+    item.style.setProperty('--sink-y',`${centerY-(r.top+r.height/2)}px`);
+    item.style.setProperty('--sink-rotate',`${(i%2?'':'-')}${12+i*7}deg`);
+    item.style.setProperty('--sink-delay',`${i*.055}s`);
+  });
+  let cleared=false;
+  try{
+    const res=await apiFetch('/api/history',{method:'DELETE'});
+    cleared=res.ok;
+  }catch(e){}
+  setTimeout(()=>{
+    if(cleared){historyData=[];renderHistory();}
+    document.body.classList.remove('memory-collapsing');
+    memoryCollapse.classList.remove('active');memoryCollapse.setAttribute('aria-hidden','true');
+    document.getElementById('clearHistory').disabled=false;
+    document.getElementById('memoryState').textContent='PRIVATE DATABASE';
+    toast(cleared?(items.length?'Council memory cleared.':'Council memory is already empty.'): 'Could not clear council memory.');
+  },2100+Math.min(items.length,12)*55);
+}
+document.getElementById('clearHistory').onclick=collapseMemory;
+renderHistory();
+
+/* ---------- command palette + demo ---------- */
+
+const command=document.getElementById('command'),backdrop=document.getElementById('backdrop'),cmdInput=document.getElementById('cmdInput');
+function toggleCommand(){command.classList.toggle('open');backdrop.classList.toggle('open');if(command.classList.contains('open'))setTimeout(()=>cmdInput.focus(),50)}
+function closeCommand(){command.classList.remove('open');backdrop.classList.remove('open')}
+document.getElementById('cmdBtn').onclick=toggleCommand;backdrop.onclick=closeCommand;
+document.querySelectorAll('[data-cmd]').forEach(b=>b.onclick=()=>{const c=b.dataset.cmd;if(c==='demo')runDemo();else cinematicNavigate(c);closeCommand()});
+cmdInput.addEventListener('keydown',e=>{if(e.key==='Enter'){const v=cmdInput.value.toLowerCase();if(v.includes('memory')||v.includes('history'))openPanel('history');else if(v.includes('council')||v.includes('debate'))openPanel('chamber');else if(v.includes('game')||v.includes('arcade'))openPanel('games');else if(v.includes('demo'))runDemo();else openPanel('home');closeCommand()}});
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1900)}
+function runDemo(){
+  cinematicNavigate('chamber');toast('Cinematic council sequence launched.');
+  setTimeout(()=>convene(),550);
+}
+document.getElementById('demoBtn').onclick=runDemo;
+
+/* ---------- AInimity Arcade: four tiny local games ---------- */
+(function initAinimityArcade(){
+  const canvas=document.getElementById('gameCanvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  const title=document.getElementById('gameTitle'),status=document.getElementById('gameStatus');
+  const scoreEl=document.getElementById('gameScore'),hint=document.getElementById('gameInstructions');
+  const nav=document.getElementById('gameNav'),start=document.getElementById('gameStart');
+  let current='pacman',game=null,raf=0,last=0,active=false;
+  const meta={
+    pacman:['Pacman','Arrow keys / WASD move through the maze.','MAZE · COLLECT · ESCAPE'],
+    snake:['Snake Bite','Arrow keys / WASD steer the snake.','GROW · TURN · SURVIVE'],
+    tetris:['Tetris','Arrows move · Up rotates · Space drops.','STACK · CLEAR · RISE'],
+    bouncy:['Bouncy Tales','Arrows steer the bounce and catch the stars.','BOUNCE · CATCH · FLOAT'],
+  };
+  const rnd=n=>Math.floor(Math.random()*n);
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  function setMeta(){const m=meta[current];title.textContent=m[0];hint.innerHTML='<b>'+m[1].split(' ')[0]+'</b> '+m[1].split(' ').slice(1).join(' ');}
+  function setScore(n,word='SCORE'){scoreEl.textContent=word+' '+n;status.textContent=(game?.over?'GAME OVER':'PLAYING')+' · '+n;}
+  function clear(){ctx.fillStyle='#030612';ctx.fillRect(0,0,W,H);ctx.strokeStyle='rgba(120,150,255,.06)';for(let x=0;x<W;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}for(let y=0;y<H;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}}
+  function text(t,x,y,size=16,color='#dce6ff',align='left'){ctx.fillStyle=color;ctx.font=size+'px Space Grotesk, sans-serif';ctx.textAlign=align;ctx.fillText(t,x,y)}
+  function endCard(message){ctx.fillStyle='rgba(2,4,14,.78)';ctx.fillRect(0,0,W,H);text(message,W/2,H/2-8,28,'#fff','center');text('Press START / RESTART to play again',W/2,H/2+28,12,'#8d9bb8','center')}
+
+  function makePacman(){
+    const map=['####################','#..................#','#.####.#####.####..#','#..................#','#.####.#####.####..#','#..................#','#..##............##.#','#..................#','#.####.#####.####..#','#..................#','#..................#','####################'];
+    const pellets=new Set();map.forEach((r,y)=>[...r].forEach((c,x)=>{if(c==='.')pellets.add(x+','+y)}));
+    const g={x:1,y:1,dir:{x:1,y:0},next:{x:1,y:0},ghost:{x:18,y:10},score:0,over:false,acc:0,handleKey(k){const d={ArrowUp:{x:0,y:-1},w:{x:0,y:-1},ArrowDown:{x:0,y:1},s:{x:0,y:1},ArrowLeft:{x:-1,y:0},a:{x:-1,y:0},ArrowRight:{x:1,y:0},d:{x:1,y:0}}[k];if(d)this.next=d},tick(dt){this.acc+=dt;if(this.acc<115)return;this.acc=0;const can=(d)=>map[this.y+d.y]?.[this.x+d.x]!=='#';if(can(this.next))this.dir=this.next;if(can(this.dir)){this.x+=this.dir.x;this.y+=this.dir.y}const key=this.x+','+this.y;if(pellets.delete(key)){this.score+=10}const chase=this.ghost.x<this.x?1:-1;if(map[this.ghost.y]?.[this.ghost.x+chase]!=='#')this.ghost.x+=chase;else if(map[this.ghost.y+1]?.[this.ghost.x]!=='#')this.ghost.y++;if(this.ghost.x===this.x&&this.ghost.y===this.y)this.over=true;if(!pellets.size)this.over=true;setScore(this.score)},draw(){clear();const cw=32,ch=H/12;map.forEach((r,y)=>[...r].forEach((c,x)=>{if(c==='#'){ctx.fillStyle='rgba(73,107,255,.38)';ctx.fillRect(x*cw+3,y*ch+3,cw-6,ch-6);ctx.strokeStyle='rgba(120,180,255,.6)';ctx.strokeRect(x*cw+5,y*ch+5,cw-10,ch-10)}}));pellets.forEach(k=>{const [x,y]=k.split(',').map(Number);ctx.fillStyle='#ffe59a';ctx.beginPath();ctx.arc(x*cw+cw/2,y*ch+ch/2,3,0,Math.PI*2);ctx.fill()});ctx.fillStyle='#ff4f87';ctx.beginPath();ctx.arc(this.ghost.x*cw+16,this.ghost.y*ch+16,11,Math.PI,0);ctx.lineTo(this.ghost.x*cw+27,this.ghost.y*ch+28);ctx.lineTo(this.ghost.x*cw+5,this.ghost.y*ch+28);ctx.fill();ctx.fillStyle='#ffd36a';ctx.beginPath();ctx.arc(this.x*cw+16,this.y*ch+16,12,.25,Math.PI*2-.25);ctx.lineTo(this.x*cw+16,this.y*ch+16);ctx.fill();if(this.over)endCard(pellets.size?'Caught in the maze':'Maze cleared')},click(){}};return g;
+  }
+  function makeSnake(){
+    const cols=32,rows=20,g={snake:[{x:8,y:10},{x:7,y:10},{x:6,y:10}],dir:{x:1,y:0},next:{x:1,y:0},food:{x:16,y:10},score:0,over:false,acc:0,handleKey(k){const d={ArrowUp:{x:0,y:-1},w:{x:0,y:-1},ArrowDown:{x:0,y:1},s:{x:0,y:1},ArrowLeft:{x:-1,y:0},a:{x:-1,y:0},ArrowRight:{x:1,y:0},d:{x:1,y:0}}[k];if(d&&!(d.x===-this.dir.x&&d.y===-this.dir.y))this.next=d},tick(dt){this.acc+=dt;if(this.acc<105)return;this.acc=0;this.dir=this.next;const h={x:this.snake[0].x+this.dir.x,y:this.snake[0].y+this.dir.y};if(h.x<0||h.x>=cols||h.y<0||h.y>=rows||this.snake.some(p=>p.x===h.x&&p.y===h.y)){this.over=true;return}this.snake.unshift(h);if(h.x===this.food.x&&h.y===this.food.y){this.score+=10;do{this.food={x:rnd(cols),y:rnd(rows)}}while(this.snake.some(p=>p.x===this.food.x&&p.y===this.food.y))}else this.snake.pop();setScore(this.score)},draw(){clear();const cw=W/cols,ch=H/rows;ctx.fillStyle='#ff4f87';ctx.beginPath();ctx.arc(this.food.x*cw+cw/2,this.food.y*ch+ch/2,7,0,Math.PI*2);ctx.fill();this.snake.forEach((p,i)=>{ctx.fillStyle=i?'#48e6c1':'#c8fff1';ctx.fillRect(p.x*cw+2,p.y*ch+2,cw-4,ch-4)});if(this.over)endCard('Snake bite!')}};return g;
+  }
+  const shapes=[[[1,1,1,1]],[[1,1],[1,1]],[[0,1,0],[1,1,1]],[[1,0,0],[1,1,1]],[[0,0,1],[1,1,1]],[[1,1,0],[0,1,1]],[[0,1,1],[1,1,0]]];
+  function makeTetris(){const cols=10,rows=20,board=Array.from({length:rows},()=>Array(cols).fill(0));const g={piece:null,x:3,y:0,score:0,over:false,acc:0,spawn(){this.piece=shapes[rnd(shapes.length)].map(r=>r.slice());this.x=3;this.y=0;if(this.hit(this.x,this.y,this.piece))this.over=true},hit(x,y,p){return p.some((r,dy)=>r.some((v,dx)=>v&&(x+dx<0||x+dx>=cols||y+dy>=rows||(y+dy>=0&&board[y+dy][x+dx]))))},merge(){this.piece.forEach((r,dy)=>r.forEach((v,dx)=>{if(v&&this.y+dy>=0)board[this.y+dy][this.x+dx]=1}));let lines=0;for(let y=rows-1;y>=0;y--)if(board[y].every(Boolean)){board.splice(y,1);board.unshift(Array(cols).fill(0));lines++;y++}this.score+=lines*100;this.spawn()},rotate(){const p=this.piece.map((r,i)=>r.map((_,j)=>this.piece[this.piece.length-1-j][i]));if(!this.hit(this.x,this.y,p))this.piece=p},handleKey(k){if(this.over)return;if(k==='ArrowLeft'&& !this.hit(this.x-1,this.y,this.piece))this.x--;if(k==='ArrowRight'&&!this.hit(this.x+1,this.y,this.piece))this.x++;if(k==='ArrowUp')this.rotate();if(k==='ArrowDown'&&!this.hit(this.x,this.y+1,this.piece))this.y++;if(k===' '){while(!this.hit(this.x,this.y+1,this.piece))this.y++;this.merge()}},tick(dt){this.acc+=dt;if(this.acc<430)return;this.acc=0;if(this.hit(this.x,this.y+1,this.piece))this.merge();else this.y++;setScore(this.score)},draw(){clear();const cw=22,ch=20,ox=210;ctx.fillStyle='rgba(24,31,74,.65)';ctx.fillRect(ox,0,cols*cw,rows*ch);board.forEach((r,y)=>r.forEach((v,x)=>{if(v){ctx.fillStyle='#6f8cff';ctx.fillRect(ox+x*cw+1,y*ch+1,cw-2,ch-2)}}));if(this.piece)this.piece.forEach((r,dy)=>r.forEach((v,dx)=>{if(v){ctx.fillStyle='#48e6c1';ctx.fillRect(ox+(this.x+dx)*cw+1,(this.y+dy)*ch+1,cw-2,ch-2)}}));if(this.over)endCard('The stack reached the sky')}};g.spawn();return g}
+  function makeBouncy(){const stars=Array.from({length:8},()=>({x:30+rnd(W-60),y:30+rnd(H-60),got:false}));return {x:100,y:200,vx:150,vy:0,score:0,over:false,keys:{},stars,handleKey(k,down=true){this.keys[k]=down},tick(dt){const t=dt/1000;if(this.keys.ArrowLeft||this.keys.a)this.vx-=220*t;if(this.keys.ArrowRight||this.keys.d)this.vx+=220*t;this.vx*=.99;this.vy+=370*t;this.x+=this.vx*t;this.y+=this.vy*t;if(this.x<14||this.x>W-14){this.vx*=-.8;this.x=clamp(this.x,14,W-14)}if(this.y>H-20){this.y=H-20;this.vy=-Math.abs(this.vy)*.88}if(this.y<14){this.y=14;this.vy=Math.abs(this.vy)}this.stars.forEach(s=>{if(!s.got&&Math.hypot(s.x-this.x,s.y-this.y)<18){s.got=true;this.score+=10}});if(this.stars.every(s=>s.got))this.stars.forEach(s=>{s.got=false});setScore(this.score)},draw(){clear();this.stars.forEach(s=>{if(!s.got){ctx.fillStyle='#ffd36a';ctx.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,r=i%2?5:11;ctx.lineTo(s.x+Math.cos(a)*r,s.y+Math.sin(a)*r)}ctx.fill()}});ctx.fillStyle='#a679ff';ctx.shadowBlur=24;ctx.shadowColor='#a679ff';ctx.beginPath();ctx.arc(this.x,this.y,14,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;text('CATCH THE STARS',18,28,11,'#9aa8c8');}}}
+  const makers={pacman:makePacman,snake:makeSnake,tetris:makeTetris,bouncy:makeBouncy};
+  function reset(name=current){current=name;game=makers[current]();setMeta();game.draw();setScore(game.score||0,'SCORE');}
+  function frame(ts){if(!active||document.hidden){raf=0;return}const dt=Math.min(50,ts-(last||ts));last=ts;if(game&&!game.over){game.tick(dt);game.draw()}raf=requestAnimationFrame(frame)}
+  function syncArcade(){const next=!document.hidden&&document.getElementById('games')?.classList.contains('active');if(next&&!active){active=true;last=0;raf=requestAnimationFrame(frame)}else if(!next&&active){active=false;cancelAnimationFrame(raf);raf=0}}
+  function select(name){if(!makers[name])return;nav.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.game===name));reset(name)}
+  nav.addEventListener('click',e=>{const b=e.target.closest('button[data-game]');if(b)select(b.dataset.game)});
+  start.onclick=()=>{reset(current);syncArcade()};
+  document.addEventListener('ainimity:panel',syncArcade);
+  document.addEventListener('visibilitychange',syncArcade);
+  window.addEventListener('keydown',e=>{if(document.getElementById('games')?.classList.contains('active')){if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();game?.handleKey?.(e.key);}});
+  window.addEventListener('keyup',e=>{if(document.getElementById('games')?.classList.contains('active'))game?.handleKey?.(e.key,false)});
+  canvas.addEventListener('click',e=>{const r=canvas.getBoundingClientRect();game?.click?.((e.clientX-r.left)*W/r.width,(e.clientY-r.top)*H/r.height)});
+  reset('pacman');syncArcade();
+})();
+
+
+
+/* ---------- Evidence Observatory ---------- */
+const evidenceFile=document.getElementById('evidenceFile'), evidenceOutput=document.getElementById('evidenceOutput'), evidenceStatus=document.getElementById('evidenceStatus');
+function readFileAsBase64(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result||'').split(',')[1]||'');r.onerror=()=>reject(new Error('The browser could not read this file.'));r.readAsDataURL(file)})}
+function renderEvidence(result){
+  const claims=(result.claims||[]).map(c=>`<div class="claim-item" data-status="${esc(c.status)}"><b>${esc(c.claim_type||'CLAIM')} · ${esc(c.status).toUpperCase()}</b><span>${esc(c.claim)}</span><span>${esc(c.support||'No support explanation returned.')} · ${esc(c.risk_level||'medium').toUpperCase()} RISK · HUMAN REVIEW</span></div>`).join('');
+  const signals=(result.provenance_signals||[]).map(x=>`<div class="signal-item"><b>PROVENANCE SIGNAL</b><span>${esc(x)}</span></div>`).join('');
+  const missing=(result.missing_information||[]).map(x=>`<div class="signal-item"><b>MISSING CONTEXT</b><span>${esc(x)}</span></div>`).join('');
+  const questions=(result.recommended_questions||[]).map(x=>`<div class="signal-item"><b>ASK A HUMAN REVIEWER</b><span>${esc(x)}</span></div>`).join('');
+  evidenceOutput.className='observatory-card observatory-output';
+  evidenceOutput.innerHTML=`<div class="kicker">${esc(result.category||'DOCUMENT').toUpperCase()} · ${esc(result.filename||'EVIDENCE')}</div><h3>${esc(result.reliability_band||'mixed').toUpperCase()} evidence health</h3><div class="score-ring"><strong>${Number(result.reliability_score||0)}</strong><div><small>RELIABILITY SIGNAL / 100</small><span>Not a truth guarantee. Human review remains required.</span></div></div><p>${esc(result.summary||'No summary returned.')}</p><div class="signal-list">${signals}${claims}</div>${missing?`<h4 style="margin-top:18px">MISSING INFORMATION</h4><div class="signal-list">${missing}</div>`:''}${questions?`<h4 style="margin-top:18px">REVIEW QUEUE</h4><div class="signal-list">${questions}</div>`:''}<div class="safety-note">${esc(result.safety_notice||'Review before acting.')}</div>`;
+}
+async function assessEvidenceDocument(){
+  const file=evidenceFile?.files?.[0];
+  if(!file){toast('Choose a PDF or text document first.');return}
+  if(file.size>32*1024*1024){toast('Evidence Observatory accepts files up to 32 MB.');return}
+  evidenceStatus.textContent='READING · EXTRACTING TEXT';
+  document.getElementById('assessEvidence').disabled=true;
+  try{
+    const base64=await readFileAsBase64(file);
+    const res=await apiFetch('/api/evidence/assess',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({filename:file.name,category:document.getElementById('evidenceCategory').value,document_base64:base64,mime_type:file.type||null,user_context:document.getElementById('evidenceContext').value.trim()||null})});
+    if(!res.ok)throw new Error(await parseApiError(res));
+    renderEvidence(await res.json());evidenceStatus.textContent='COMPLETE · HUMAN REVIEW QUEUE';
+  }catch(err){evidenceStatus.textContent='ERROR · TRY AGAIN';evidenceOutput.innerHTML=`<div class="kicker">OBSERVATORY ERROR</div><h3>Document not assessed.</h3><p>${esc(councilErrorMessage(err))}</p>`}
+  finally{document.getElementById('assessEvidence').disabled=false}
+}
+document.getElementById('assessEvidence').onclick=assessEvidenceDocument;
+
+/* ---------- ChronoForge manual scenario playback ---------- */
+const chronoEvents=document.getElementById('chronoEvents'), chronoOutput=document.getElementById('chronoOutput');
+let chronoEventData=[{day:7,title:'A new piece of evidence arrives',impact:'positive'},{day:14,title:'A critical risk is discovered',impact:'critical'}];
+function renderChronoEvents(){chronoEvents.innerHTML=chronoEventData.map((e,i)=>`<div class="event-row"><input class="manual-input chrono-day" data-i="${i}" type="number" min="0" max="3650" value="${e.day}" aria-label="Event day"><input class="manual-input chrono-title" data-i="${i}" value="${esc(e.title)}" aria-label="Event title"><select class="manual-select chrono-impact" data-i="${i}" aria-label="Event impact"><option value="positive" ${e.impact==='positive'?'selected':''}>Positive</option><option value="neutral" ${e.impact==='neutral'?'selected':''}>Neutral</option><option value="negative" ${e.impact==='negative'?'selected':''}>Negative</option><option value="critical" ${e.impact==='critical'?'selected':''}>Critical</option></select><button class="event-remove" data-remove="${i}" type="button" aria-label="Remove event">×</button></div>`).join('');
+  chronoEvents.querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{chronoEventData.splice(Number(b.dataset.remove),1);renderChronoEvents()});
+  chronoEvents.querySelectorAll('.chrono-day').forEach(x=>x.oninput=()=>chronoEventData[Number(x.dataset.i)].day=Number(x.value)||0);
+  chronoEvents.querySelectorAll('.chrono-title').forEach(x=>x.oninput=()=>chronoEventData[Number(x.dataset.i)].title=x.value);
+  chronoEvents.querySelectorAll('.chrono-impact').forEach(x=>x.onchange=()=>chronoEventData[Number(x.dataset.i)].impact=x.value);
+}
+renderChronoEvents();
+document.getElementById('addChronoEvent').onclick=()=>{chronoEventData.push({day:chronoEventData.length?chronoEventData.at(-1).day+7:7,title:'New manual event',impact:'neutral'});renderChronoEvents()};
+function renderChrono(result){
+  const checkpoints=(result.checkpoints||[]).map(c=>`<div class="checkpoint-item"><b>DAY ${c.day} · ${esc(c.title)}</b><span>${esc(c.state)}</span><span>RISK ${c.risk_score}/100 · CONFIDENCE ${c.confidence}%</span><span>${(c.signals||[]).map(esc).join(' · ')}</span></div>`).join('');
+  const branches=(result.branches||[]).map(b=>`<div class="branch-item"><b>${esc(b.title)}</b><span>${esc(b.decision)} · RISK ${b.risk_score}/100 · ${esc(b.reversibility).toUpperCase()} REVERSIBILITY</span><span>${esc(b.rationale)}</span></div>`).join('');
+  chronoOutput.innerHTML=`<div class="kicker">CHRONOFORGE · ${result.horizon_days} DAY HORIZON</div><h3>${esc(result.objective)}</h3><div class="timeline-track"><h4>CHECKPOINTS</h4><div class="checkpoint-list">${checkpoints}</div></div><h4 style="margin-top:18px">BRANCH COMPARISON</h4><div class="branch-list">${branches}</div><div class="safety-note">${esc(result.safety_notice)}</div>`;
+}
+document.getElementById('playChrono').onclick=async()=>{
+  const status=document.getElementById('chronoStatus');status.textContent='PLAYING · MANUAL EVENTS';document.getElementById('playChrono').disabled=true;
+  try{const res=await apiFetch('/api/chronoforge/simulate',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({objective:document.getElementById('chronoObjective').value.trim(),initial_state:document.getElementById('chronoInitial').value.trim(),horizon_days:Number(document.getElementById('chronoHorizon').value)||30,events:chronoEventData.map(e=>({...e,selected:true}))})});if(!res.ok)throw new Error(await parseApiError(res));renderChrono(await res.json());status.textContent='COMPLETE · COMPARE BRANCHES'}catch(err){status.textContent='ERROR · TRY AGAIN';chronoOutput.innerHTML=`<div class="kicker">CHRONOFORGE ERROR</div><h3>Timeline did not run.</h3><p>${esc(councilErrorMessage(err))}</p>`}finally{document.getElementById('playChrono').disabled=false}
+};
+
+/* ---------- boot cinematic ---------- */
+setTimeout(()=>document.getElementById('boot').classList.add('hide'),1800);
+(async()=>{
+  const previewMode=new URLSearchParams(location.search).get('preview')==='multiverse';
+  if(previewMode){
+    document.body.dataset.preview='multiverse';
+    setUser({email:'QUANTUM PREVIEW'});
+    hideAuth();
+    document.getElementById('universeStatus').textContent='PREVIEW · NEXUS PRIME';
+    return;
+  }
+  try{
+    await initSupabase();
+    await checkSession();
+  }catch(err){
+    console.error('[AInimity] Supabase initialization failed:',err);
+    setUser(null);
+    showAuth('login');
+    authMsg(err?.message||'Authentication service is unavailable.','error');
+  }
+})();
+</script>
+</body>
+</html>

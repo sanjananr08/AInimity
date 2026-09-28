@@ -1,0 +1,19 @@
+[
+  {
+    "id": "source-grounded-choice",
+    "dilemma": "Should a small team ship a reliable MVP before adding an experimental AI feature?",
+    "evidence": [{"source_id": "src_demo", "status": "retrieved", "title": "Release reliability notes", "snippet": "Smaller releases reduce operational risk when time is limited."}],
+    "expected": ["one_recommendation", "argument_graph", "source_id_or_explicit_no_citation"]
+  },
+  {
+    "id": "human-values-interruption",
+    "dilemma": "Should an automated service be used in a high-stakes customer support flow?",
+    "rebuttal": "I care more about dignity and an easy human handoff than maximum automation.",
+    "expected": ["human_mind", "user_rebuttal_in_context", "validator_mentions_tradeoff"]
+  },
+  {
+    "id": "image-reference",
+    "dilemma": "Which game is visually closest to this reference?",
+    "expected": ["explicit_image_attachment", "never_claims_image_read_without_attachment"]
+  }
+]
