@@ -1485,11 +1485,11 @@ async function runViaBackend(payload){
     return runClassicCouncil(payload,startedAt);
   }
 
+  let finalResult=null;
   try{
     const reader=res.body.getReader();
     const decoder=new TextDecoder();
     let buffer='';
-    let finalResult=null;
     const processChunk=chunk=>{
       const line=chunk.split('\n').find(x=>x.startsWith('data: '));
       if(!line)return;
